@@ -122,7 +122,7 @@ export function AdminDash({users,onUpdate}){
                 </div>
                 <div style={{display:"flex",gap:8,marginTop:12}}>
                   <button style={T.bg} onClick={()=>setShowNew(false)}>Cancelar</button>
-                  <button style={T.bp} onClick={addUser}>Crear usuario -></button>
+                  <button style={T.bp} onClick={addUser}>Crear usuario &rarr;</button>
                 </div>
               </div>
             )}
@@ -151,7 +151,7 @@ export function AdminDash({users,onUpdate}){
                   </div>
                   <div style={{display:"flex",gap:8,marginTop:16}}>
                     <button style={T.bg} onClick={()=>setEditUser(null)}>Cancelar</button>
-                    <button style={T.bp} onClick={saveEdit}>Guardar cambios -></button>
+                    <button style={T.bp} onClick={saveEdit}>Guardar cambios &rarr;</button>
                   </div>
                 </div>
               </div>
@@ -223,7 +223,7 @@ export function AdminDash({users,onUpdate}){
               </div>
             ):(
               <div className="fi">
-                <button style={{...T.bg,marginBottom:14}} onClick={()=>setViewStudentId(null)}><- Volver</button>
+                <button style={{...T.bg,marginBottom:14}} onClick={()=>setViewStudentId(null)}>&larr; Volver</button>
                 <div style={{...T.card,marginBottom:14,display:"flex",alignItems:"center",gap:12,border:"1px solid rgba(255,154,58,0.3)"}}>
                   <div style={{fontSize:24}}>A</div>
                   <div><div style={{fontSize:15,fontWeight:700}}>{viewStudent.name} <span style={{fontFamily:"var(--fm)",fontSize:11,color:"var(--mu)"}}>{viewStudent.uid}</span></div>
@@ -276,7 +276,7 @@ export function AdminDash({users,onUpdate}){
                   </div>
                   <div style={{display:"flex",gap:8}}>
                     <button style={T.bg} onClick={()=>setEditingGym(false)}>Cancelar</button>
-                    <button style={T.bp} onClick={()=>{setGymInfo({...gymDraft});setEditingGym(false);}}>Guardar -></button>
+                    <button style={T.bp} onClick={()=>{setGymInfo({...gymDraft});setEditingGym(false);}}>Guardar &rarr;</button>
                   </div>
                 </div>
               ):(
@@ -372,7 +372,7 @@ export function Login({users,onLogin,onUpdateUsers}){
               <span style={{fontSize:12,color:"var(--mu)",cursor:"pointer",textDecoration:"underline"}} onClick={()=>{setScreen("forgot");setError("");setMsg("");}}>?Olvidaste tu contraseña?</span>
             </div>
             {error&&<div style={{color:"var(--a3)",fontSize:13,marginBottom:12,background:"rgba(255,58,110,0.1)",padding:"8px 12px",borderRadius:8}}>{error}</div>}
-            <button style={{...T.bp,width:"100%",padding:12}} onClick={handle}>Ingresar -></button>
+            <button style={{...T.bp,width:"100%",padding:12}} onClick={handle}>Ingresar &rarr;</button>
           </div>
         )}
         {screen==="forgot"&&(
@@ -383,7 +383,7 @@ export function Login({users,onLogin,onUpdateUsers}){
             {error&&<div style={{color:"var(--a3)",fontSize:13,marginBottom:12,background:"rgba(255,58,110,0.1)",padding:"8px 12px",borderRadius:8}}>{error}</div>}
             {msg&&<div style={{color:"var(--gr)",fontSize:13,marginBottom:12,background:"rgba(58,255,138,0.1)",padding:"8px 12px",borderRadius:8}}>{msg}</div>}
             <button style={{...T.bp,width:"100%",padding:12,opacity:loading?0.6:1}} onClick={sendReset}>{loading?"Enviando...":"Enviar código ->"}</button>
-            <button style={{...T.bg,width:"100%",marginTop:8}} onClick={()=>setScreen("login")}><- Volver</button>
+            <button style={{...T.bg,width:"100%",marginTop:8}} onClick={()=>setScreen("login")}>&larr; Volver</button>
           </div>
         )}
         {screen==="verify"&&(
@@ -393,8 +393,8 @@ export function Login({users,onLogin,onUpdateUsers}){
             {msg&&<div style={{color:"var(--gr)",fontSize:13,marginBottom:12,background:"rgba(58,255,138,0.1)",padding:"8px 12px",borderRadius:8}}>{msg}</div>}
             <div style={{marginBottom:14}}><label style={{fontSize:11,color:"var(--mu)",display:"block",marginBottom:5}}>CÓDIGO</label><input value={code} onChange={e=>setCode(e.target.value)} placeholder="123456" style={{fontSize:24,fontFamily:"var(--fm)",textAlign:"center",letterSpacing:8}}/></div>
             {error&&<div style={{color:"var(--a3)",fontSize:13,marginBottom:12,background:"rgba(255,58,110,0.1)",padding:"8px 12px",borderRadius:8}}>{error}</div>}
-            <button style={{...T.bp,width:"100%",padding:12}} onClick={verifyCode}>Verificar -></button>
-            <button style={{...T.bg,width:"100%",marginTop:8}} onClick={()=>setScreen("forgot")}><- Volver</button>
+            <button style={{...T.bp,width:"100%",padding:12}} onClick={verifyCode}>Verificar &rarr;</button>
+            <button style={{...T.bg,width:"100%",marginTop:8}} onClick={()=>setScreen("forgot")}>&larr; Volver</button>
           </div>
         )}
         {screen==="newpass"&&(
@@ -404,7 +404,7 @@ export function Login({users,onLogin,onUpdateUsers}){
             <div style={{marginBottom:12}}><label style={{fontSize:11,color:"var(--mu)",display:"block",marginBottom:5}}>NUEVA CONTRASEÑA</label><input type="password" value={newPass} onChange={e=>setNewPass(e.target.value)} placeholder="????????"/></div>
             <div style={{marginBottom:16}}><label style={{fontSize:11,color:"var(--mu)",display:"block",marginBottom:5}}>CONFIRMAR CONTRASEÑA</label><input type="password" value={newPass2} onChange={e=>setNewPass2(e.target.value)} placeholder="????????"/></div>
             {error&&<div style={{color:"var(--a3)",fontSize:13,marginBottom:12,background:"rgba(255,58,110,0.1)",padding:"8px 12px",borderRadius:8}}>{error}</div>}
-            <button style={{...T.bp,width:"100%",padding:12}} onClick={saveNewPass}>Guardar contraseña -></button>
+            <button style={{...T.bp,width:"100%",padding:12}} onClick={saveNewPass}>Guardar contraseña &rarr;</button>
           </div>
         )}
         <div style={{marginTop:14,padding:12,background:"var(--sf)",borderRadius:8,border:"1px solid var(--br)"}}>
