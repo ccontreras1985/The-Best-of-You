@@ -292,10 +292,10 @@ export function AdminDash({users,onUpdate}){
         )}
         {tab==="finance"&&<FinanceDash users={users} students={students} trainers={trainers} plans={plans} onUpdate={onUpdate} setProformaStudent={setProformaStudent}/>}
       </div>
-    </div>
       {profUser&&<ProfileSetup userName={profUser.name} onSave={p=>{if(p)onUpdate(users.map(u=>u.id===profUser.id?{...u,profile:p}:u));setProfUser(null);}}/>}
       {proformaStudent&&<ProformaModal student={proformaStudent} allUsers={users} plans={plans} gymInfo={gymInfo} onClose={()=>setProformaStudent(null)}/>}
     </div>
+  </div>
   );
 }
 
