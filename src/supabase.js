@@ -61,4 +61,17 @@ export const db = {
       body: JSON.stringify({ data }),
     });
   },
+
+  // EMAIL
+  async sendEmail(payload) {
+    const res = await fetch("https://kjxpfppyyvegpibuhyjn.supabase.co/functions/v1/send-email", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${SUPABASE_KEY}`,
+      },
+      body: JSON.stringify(payload),
+    });
+    return res.json();
+  },
 };
