@@ -5,7 +5,7 @@ import { GS, T, MACHINES, MACHINE_GROUPS, GROUP_ICONS, GC, MONTHS, DEFAULT_PLANS
   monthCount, todayISO, fmtCLP, gLbl,
   MachineSelect, MiniLine, MuscleRadar, AttCal, ProfileSetup, SessionModal, SessionsTab,
   ProformaModal, StudentDash, TrainerDash, FinanceDash, AdminDash, Login
-} from "./components2.jsx";
+} from "./components2b.jsx";
 
 export default function App(){
   const[users,setUsers]=useState([]);
