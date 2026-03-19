@@ -1,9 +1,3 @@
-import { useState } from "react";
-import { db } from "./supabase.js";
-export * from "./components2a.jsx";
-
-import { useState } from "react";
-import { db } from "./supabase.js";
 export * from "./components2a.jsx";
 
 export function AdminDash({users,onUpdate}){
