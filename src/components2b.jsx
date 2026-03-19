@@ -70,7 +70,7 @@ export function AdminDash({users,onUpdate}){
   const totalNet=financeRows.reduce((a,x)=>a+(x.net||0),0);
   const totalBruto=Math.round(totalNet*1.19);
   const viewStudent=viewStudentId?users.find(u=>u.id===viewStudentId):null;
-  const TABS=[{id:"users",l:"Usuarios",i:"♟"},{id:"view",l:"Ver Alumnos",i:"🔍"},{id:"plans",l:"Planes",i:"≡"},{id:"finance",l:"Finanzas",i:"💰"}];
+  const TABS=[{id:"users",l:"Usuarios",i:"i"},{id:"view",l:"Ver Alumnos",i:"S"},{id:"plans",l:"Planes",i:"="},{id:"finance",l:"Finanzas",i:"$"}];
   return(
     <div style={{minHeight:"100vh",background:"var(--bg)"}}>
       <div style={{background:"var(--sf)",borderBottom:"1px solid var(--br)",padding:"14px 24px",display:"flex",alignItems:"center",gap:14}}>
@@ -84,8 +84,7 @@ export function AdminDash({users,onUpdate}){
         ))}
       </div>
       <div style={{padding:24,maxWidth:1100,margin:"0 auto"}} className="fi" key={tab}>
-        {/* ── USERS ── */}
-        {tab==="users"&&(
+                {tab==="users"&&(
           <div>
             <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:12,marginBottom:22}}>
               {[{l:"Total usuarios",v:users.length,c:"var(--ac)"},{l:"Entrenadores",v:trainers.length,c:"var(--a2)"},{l:"Alumnos",v:students.length,c:"var(--gr)"},{l:"Sesiones totales",v:students.reduce((a,s)=>a+(s.sessions||[]).length,0),c:"var(--a3)"}].map(x=>(
@@ -123,12 +122,11 @@ export function AdminDash({users,onUpdate}){
                 </div>
                 <div style={{display:"flex",gap:8,marginTop:12}}>
                   <button style={T.bg} onClick={()=>setShowNew(false)}>Cancelar</button>
-                  <button style={T.bp} onClick={addUser}>Crear usuario →</button>
+                  <button style={T.bp} onClick={addUser}>Crear usuario -></button>
                 </div>
               </div>
             )}
-            {/* Edit modal */}
-            {editUser&&(
+                        {editUser&&(
               <div style={T.ov} onClick={e=>e.target===e.currentTarget&&setEditUser(null)}>
                 <div className="fi" style={{...T.card,width:"100%",maxWidth:520,padding:28,maxHeight:"90vh",overflowY:"auto"}}>
                   <div style={{fontFamily:"var(--fd)",fontSize:22,letterSpacing:2,marginBottom:16}}>EDITAR USUARIO</div>
@@ -153,7 +151,7 @@ export function AdminDash({users,onUpdate}){
                   </div>
                   <div style={{display:"flex",gap:8,marginTop:16}}>
                     <button style={T.bg} onClick={()=>setEditUser(null)}>Cancelar</button>
-                    <button style={T.bp} onClick={saveEdit}>Guardar cambios →</button>
+                    <button style={T.bp} onClick={saveEdit}>Guardar cambios -></button>
                   </div>
                 </div>
               </div>
@@ -172,15 +170,15 @@ export function AdminDash({users,onUpdate}){
                           <td><span style={{fontFamily:"var(--fm)",fontSize:11,color:"var(--ac)"}}>{u.uid}</span></td>
                           <td style={{fontWeight:600}}>{u.name}</td>
                           <td style={{fontFamily:"var(--fm)",color:"var(--mu)",fontSize:12}}>@{u.username}</td>
-                          <td style={{fontSize:12,color:"var(--mu)"}}>{u.email||"—"}</td>
+                          <td style={{fontSize:12,color:"var(--mu)"}}>{u.email||"-"}</td>
                           <td><span style={{...T.tag,background:u.role==="trainer"?"rgba(58,255,232,0.12)":"rgba(232,255,58,0.12)",color:u.role==="trainer"?"var(--a2)":"var(--ac)"}}>{u.role==="trainer"?"Entrenador":"Alumno"}</span></td>
-                          <td style={{fontSize:12,color:"var(--mu)"}}>{u.role==="trainer"?`${(u.assignedStudents||[]).length} alumnos`:`${trainer?trainer.name:"Sin coach"} · ${plan?plan.name:"Sin plan"}`}</td>
+                          <td style={{fontSize:12,color:"var(--mu)"}}>{u.role==="trainer"?`${(u.assignedStudents||[]).length} alumnos`:`${trainer?trainer.name:"Sin coach"} . ${plan?plan.name:"Sin plan"}`}</td>
                           <td><span style={{...T.tag,background:isActive?"rgba(58,255,138,0.12)":"rgba(255,58,110,0.12)",color:isActive?"var(--gr)":"var(--a3)"}}>{isActive?"Activo":"Inactivo"}</span></td>
                           <td style={{fontFamily:"var(--fm)",color:"var(--ac)"}}>{(u.sessions||[]).length}</td>
                           <td><div style={{display:"flex",gap:4,flexWrap:"wrap"}}>
-                            <button style={{...T.bw,fontSize:11,padding:"4px 8px"}} onClick={()=>setEditUser({...u})}>✎</button>
-                            <button style={{...T.bg,fontSize:11,padding:"4px 8px",color:isActive?"var(--a3)":"var(--gr)",border:`1px solid ${isActive?"rgba(255,58,110,0.3)":"rgba(58,255,138,0.3)"}`}} onClick={()=>toggleActive(u.id)}>{isActive?"■":"□"}</button>
-                            <button style={{...T.bd,fontSize:11,padding:"4px 8px"}} onClick={()=>{if(window.confirm(`¿Eliminar a ${u.name}?`))deleteUser(u.id);}}>✕</button>
+                            <button style={{...T.bw,fontSize:11,padding:"4px 8px"}} onClick={()=>setEditUser({...u})}>e</button>
+                            <button style={{...T.bg,fontSize:11,padding:"4px 8px",color:isActive?"var(--a3)":"var(--gr)",border:`1px solid ${isActive?"rgba(255,58,110,0.3)":"rgba(58,255,138,0.3)"}`}} onClick={()=>toggleActive(u.id)}>{isActive?"on":"off"}</button>
+                            <button style={{...T.bd,fontSize:11,padding:"4px 8px"}} onClick={()=>{if(window.confirm(`?Eliminar a ${u.name}?`))deleteUser(u.id);}}>X</button>
                           </div></td>
                         </tr>
                       );
@@ -191,8 +189,7 @@ export function AdminDash({users,onUpdate}){
             </div>
           </div>
         )}
-        {/* ── VIEW STUDENTS ── */}
-        {tab==="view"&&(
+                {tab==="view"&&(
           <div>
             {!viewStudent?(
               <div>
@@ -204,10 +201,10 @@ export function AdminDash({users,onUpdate}){
                     return(
                       <div key={s.id} style={{...T.card,cursor:"pointer",border:`1px solid ${att?"rgba(58,255,232,0.3)":"var(--br)"}`}} onClick={()=>setViewStudentId(s.id)}>
                         <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}}>
-                          <div><div style={{fontSize:15,fontWeight:700}}>{s.name}</div><div style={{fontSize:11,color:"var(--mu)"}}>{s.uid} · @{s.username}</div></div>
+                          <div><div style={{fontSize:15,fontWeight:700}}>{s.name}</div><div style={{fontSize:11,color:"var(--mu)"}}>{s.uid} . @{s.username}</div></div>
                           <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:4}}>
                             <span style={{...T.tag,background:"rgba(58,255,232,0.12)",color:"var(--a2)"}}>{plan?plan.name:"Sin plan"}</span>
-                            {att&&<span style={{...T.tag,background:"rgba(58,255,138,0.2)",color:"var(--gr)"}}>✓ Hoy</span>}
+                            {att&&<span style={{...T.tag,background:"rgba(58,255,138,0.2)",color:"var(--gr)"}}>OK Hoy</span>}
                           </div>
                         </div>
                         <div style={{fontSize:12,color:"var(--mu)",marginBottom:8}}>Coach: {trainer?trainer.name:"Sin asignar"}</div>
@@ -226,11 +223,11 @@ export function AdminDash({users,onUpdate}){
               </div>
             ):(
               <div className="fi">
-                <button style={{...T.bg,marginBottom:14}} onClick={()=>setViewStudentId(null)}>← Volver</button>
+                <button style={{...T.bg,marginBottom:14}} onClick={()=>setViewStudentId(null)}><- Volver</button>
                 <div style={{...T.card,marginBottom:14,display:"flex",alignItems:"center",gap:12,border:"1px solid rgba(255,154,58,0.3)"}}>
-                  <div style={{fontSize:24}}>⚔</div>
+                  <div style={{fontSize:24}}>A</div>
                   <div><div style={{fontSize:15,fontWeight:700}}>{viewStudent.name} <span style={{fontFamily:"var(--fm)",fontSize:11,color:"var(--mu)"}}>{viewStudent.uid}</span></div>
-                    <div style={{fontSize:12,color:"var(--or)"}}>Vista Administrador — acceso completo</div>
+                    <div style={{fontSize:12,color:"var(--or)"}}>Vista Administrador - acceso completo</div>
                   </div>
                 </div>
                 <StudentDash user={viewStudent} allUsers={users} plans={plans} onUpdate={u=>{onUpdate(users.map(x=>x.id===u.id?u:x));setViewStudentId(null);setTimeout(()=>setViewStudentId(u.id),10);}} isEmbedded={true}/>
@@ -238,8 +235,7 @@ export function AdminDash({users,onUpdate}){
             )}
           </div>
         )}
-        {/* ── PLANS ── */}
-        {tab==="plans"&&(
+                {tab==="plans"&&(
           <div>
             <div style={{fontFamily:"var(--fd)",fontSize:18,letterSpacing:2,color:"var(--mu)",marginBottom:16}}>CONFIGURACIÓN DE PLANES</div>
             <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:14,marginBottom:28}}>
@@ -251,7 +247,7 @@ export function AdminDash({users,onUpdate}){
                       <div style={{marginBottom:8}}><label style={{fontSize:11,color:"var(--mu)",display:"block",marginBottom:4}}>SESIONES POR SEMANA</label><input type="number" value={planDraft.sessionsPerWeek||""} placeholder="Ej: 3" onChange={e=>setPlanDraft({...planDraft,sessionsPerWeek:e.target.value})}/></div>
                       <div style={{marginBottom:12}}><label style={{fontSize:11,color:"var(--mu)",display:"block",marginBottom:4}}>PRECIO NETO (CLP)</label><input type="number" value={planDraft.priceNet||""} placeholder="Ej: 49000" onChange={e=>setPlanDraft({...planDraft,priceNet:e.target.value})}/></div>
                       <div style={{display:"flex",gap:6}}>
-                        <button style={{...T.bp,fontSize:12,padding:"7px 14px"}} onClick={savePlan}>✓ Guardar</button>
+                        <button style={{...T.bp,fontSize:12,padding:"7px 14px"}} onClick={savePlan}>OK Guardar</button>
                         <button style={{...T.bg,fontSize:12}} onClick={()=>setEditingPlanId(null)}>Cancelar</button>
                       </div>
                     </div>
@@ -261,44 +257,42 @@ export function AdminDash({users,onUpdate}){
                       <div style={{fontSize:16,fontWeight:700,marginBottom:6}}>{p.name}</div>
                       <div style={{fontFamily:"var(--fm)",fontSize:26,color:"var(--ac)",marginBottom:4}}>{p.priceNet?fmtCLP(p.priceNet):"A convenir"}</div>
                       <div style={{fontSize:12,color:"var(--mu)",marginBottom:12}}>{p.sessionsPerWeek?`${p.sessionsPerWeek} sesiones/semana`:"Flexible"}</div>
-                      <div style={{fontSize:12,color:"var(--mu)",marginBottom:12}}>Con IVA: <strong style={{color:"var(--tx)"}}>{p.priceNet?fmtCLP(Math.round(p.priceNet*1.19)):"—"}</strong></div>
+                      <div style={{fontSize:12,color:"var(--mu)",marginBottom:12}}>Con IVA: <strong style={{color:"var(--tx)"}}>{p.priceNet?fmtCLP(Math.round(p.priceNet*1.19)):"-"}</strong></div>
                       <div style={{fontSize:11,color:"var(--mu)",marginBottom:12}}>Alumnos: <strong style={{color:"var(--a2)"}}>{students.filter(s=>s.planId===p.id).length}</strong></div>
-                      <button style={{...T.bw,fontSize:12,padding:"6px 14px"}} onClick={()=>startEditPlan(p)}>✎ Editar plan</button>
+                      <button style={{...T.bw,fontSize:12,padding:"6px 14px"}} onClick={()=>startEditPlan(p)}>e Editar plan</button>
                     </div>
                   )}
                 </div>
               ))}
             </div>
-            {/* Gym info */}
-            <div style={{fontFamily:"var(--fd)",fontSize:18,letterSpacing:2,color:"var(--mu)",marginBottom:14}}>DATOS DEL GYM (PROFORMA)</div>
+                        <div style={{fontFamily:"var(--fd)",fontSize:18,letterSpacing:2,color:"var(--mu)",marginBottom:14}}>DATOS DEL GYM (PROFORMA)</div>
             <div style={T.card}>
               {editingGym?(
                 <div>
                   <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:12}}>
-                    {[["Nombre del gym","name"],["RUT","rut"],["Dirección","address"],["Teléfono","phone"],["Email","email"],["Banco","bank"],["Tipo de cuenta","accountType"],["N° de cuenta","accountNumber"],["Titular cuenta","accountHolder"],["RUT titular","accountRut"]].map(([l,k])=>(
+                    {[["Nombre del gym","name"],["RUT","rut"],["Dirección","address"],["Teléfono","phone"],["Email","email"],["Banco","bank"],["Tipo de cuenta","accountType"],["N de cuenta","accountNumber"],["Titular cuenta","accountHolder"],["RUT titular","accountRut"]].map(([l,k])=>(
                       <div key={k}><label style={{fontSize:11,color:"var(--mu)",display:"block",marginBottom:4}}>{l.toUpperCase()}</label><input value={gymDraft[k]||""} onChange={e=>setGymDraft({...gymDraft,[k]:e.target.value})}/></div>
                     ))}
                   </div>
                   <div style={{display:"flex",gap:8}}>
                     <button style={T.bg} onClick={()=>setEditingGym(false)}>Cancelar</button>
-                    <button style={T.bp} onClick={()=>{setGymInfo({...gymDraft});setEditingGym(false);}}>Guardar →</button>
+                    <button style={T.bp} onClick={()=>{setGymInfo({...gymDraft});setEditingGym(false);}}>Guardar -></button>
                   </div>
                 </div>
               ):(
                 <div>
                   <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:14}}>
-                    {[["Nombre",gymInfo.name],["RUT",gymInfo.rut],["Dirección",gymInfo.address],["Teléfono",gymInfo.phone],["Email",gymInfo.email],["Banco",gymInfo.bank],["Tipo cuenta",gymInfo.accountType],["N° cuenta",gymInfo.accountNumber],["Titular",gymInfo.accountHolder],["RUT titular",gymInfo.accountRut]].map(([k,v])=>(
+                    {[["Nombre",gymInfo.name],["RUT",gymInfo.rut],["Dirección",gymInfo.address],["Teléfono",gymInfo.phone],["Email",gymInfo.email],["Banco",gymInfo.bank],["Tipo cuenta",gymInfo.accountType],["N cuenta",gymInfo.accountNumber],["Titular",gymInfo.accountHolder],["RUT titular",gymInfo.accountRut]].map(([k,v])=>(
                       <div key={k} style={{padding:"8px 12px",background:"var(--sf2)",borderRadius:8}}><div style={{fontSize:10,color:"var(--mu)",marginBottom:2}}>{k.toUpperCase()}</div><div style={{fontSize:13,fontWeight:600}}>{v}</div></div>
                     ))}
                   </div>
-                  <button style={{...T.bw,fontSize:12}} onClick={()=>{setGymDraft({...gymInfo});setEditingGym(true);}}>✎ Editar datos del gym</button>
+                  <button style={{...T.bw,fontSize:12}} onClick={()=>{setGymDraft({...gymInfo});setEditingGym(true);}}>e Editar datos del gym</button>
                 </div>
               )}
             </div>
           </div>
         )}
-        {/* ── FINANCE ── */}
-        {tab==="finance"&&<FinanceDash users={users} students={students} trainers={trainers} plans={plans} onUpdate={onUpdate} setProformaStudent={setProformaStudent}/>}
+                {tab==="finance"&&<FinanceDash users={users} students={students} trainers={trainers} plans={plans} onUpdate={onUpdate} setProformaStudent={setProformaStudent}/>}
       {profUser&&<ProfileSetup userName={profUser.name} onSave={p=>{if(p)onUpdate(users.map(u=>u.id===profUser.id?{...u,profile:p}:u));setProfUser(null);}}/>}
       {proformaStudent&&<ProformaModal student={proformaStudent} allUsers={users} plans={plans} gymInfo={gymInfo} onClose={()=>setProformaStudent(null)}/>}
     </div>
@@ -355,7 +349,7 @@ export function Login({users,onLogin,onUpdateUsers}){
   }
   const Logo=()=>(
     <div style={{textAlign:"center",marginBottom:32}}>
-      <div style={{display:"inline-flex",alignItems:"center",justifyContent:"center",width:64,height:64,borderRadius:16,background:"var(--ac)",marginBottom:12}}><span style={{fontSize:32}}>★</span></div>
+      <div style={{display:"inline-flex",alignItems:"center",justifyContent:"center",width:64,height:64,borderRadius:16,background:"var(--ac)",marginBottom:12}}><span style={{fontSize:32}}>*</span></div>
       <div style={{fontFamily:"var(--fd)",fontSize:36,letterSpacing:3}}>ELITE TRAINER</div>
       <div style={{fontSize:13,color:"var(--mu)",marginTop:4}}>The Best of You</div>
     </div>
@@ -370,15 +364,15 @@ export function Login({users,onLogin,onUpdateUsers}){
             <div style={{marginBottom:8}}>
               <label style={{fontSize:11,color:"var(--mu)",display:"block",marginBottom:5}}>CONTRASEÑA</label>
               <div style={{position:"relative"}}>
-                <input type={showPass?"text":"password"} value={password} onChange={e=>setPassword(e.target.value)} placeholder="••••••••" onKeyDown={e=>e.key==="Enter"&&handle()} style={{paddingRight:44}}/>
-                <button onClick={()=>setShowPass(p=>!p)} style={{position:"absolute",right:10,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",color:"var(--mu)",fontSize:16,cursor:"pointer",padding:4}}>{showPass?"◉":"◎"}</button>
+                <input type={showPass?"text":"password"} value={password} onChange={e=>setPassword(e.target.value)} placeholder="????????" onKeyDown={e=>e.key==="Enter"&&handle()} style={{paddingRight:44}}/>
+                <button onClick={()=>setShowPass(p=>!p)} style={{position:"absolute",right:10,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",color:"var(--mu)",fontSize:16,cursor:"pointer",padding:4}}>{showPass?"o":"o"}</button>
               </div>
             </div>
             <div style={{textAlign:"right",marginBottom:16}}>
-              <span style={{fontSize:12,color:"var(--mu)",cursor:"pointer",textDecoration:"underline"}} onClick={()=>{setScreen("forgot");setError("");setMsg("");}}>¿Olvidaste tu contraseña?</span>
+              <span style={{fontSize:12,color:"var(--mu)",cursor:"pointer",textDecoration:"underline"}} onClick={()=>{setScreen("forgot");setError("");setMsg("");}}>?Olvidaste tu contraseña?</span>
             </div>
             {error&&<div style={{color:"var(--a3)",fontSize:13,marginBottom:12,background:"rgba(255,58,110,0.1)",padding:"8px 12px",borderRadius:8}}>{error}</div>}
-            <button style={{...T.bp,width:"100%",padding:12}} onClick={handle}>Ingresar →</button>
+            <button style={{...T.bp,width:"100%",padding:12}} onClick={handle}>Ingresar -></button>
           </div>
         )}
         {screen==="forgot"&&(
@@ -388,8 +382,8 @@ export function Login({users,onLogin,onUpdateUsers}){
             <div style={{marginBottom:14}}><label style={{fontSize:11,color:"var(--mu)",display:"block",marginBottom:5}}>EMAIL</label><input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="tu@email.com"/></div>
             {error&&<div style={{color:"var(--a3)",fontSize:13,marginBottom:12,background:"rgba(255,58,110,0.1)",padding:"8px 12px",borderRadius:8}}>{error}</div>}
             {msg&&<div style={{color:"var(--gr)",fontSize:13,marginBottom:12,background:"rgba(58,255,138,0.1)",padding:"8px 12px",borderRadius:8}}>{msg}</div>}
-            <button style={{...T.bp,width:"100%",padding:12,opacity:loading?0.6:1}} onClick={sendReset}>{loading?"Enviando...":"Enviar código →"}</button>
-            <button style={{...T.bg,width:"100%",marginTop:8}} onClick={()=>setScreen("login")}>← Volver</button>
+            <button style={{...T.bp,width:"100%",padding:12,opacity:loading?0.6:1}} onClick={sendReset}>{loading?"Enviando...":"Enviar código ->"}</button>
+            <button style={{...T.bg,width:"100%",marginTop:8}} onClick={()=>setScreen("login")}><- Volver</button>
           </div>
         )}
         {screen==="verify"&&(
@@ -399,18 +393,18 @@ export function Login({users,onLogin,onUpdateUsers}){
             {msg&&<div style={{color:"var(--gr)",fontSize:13,marginBottom:12,background:"rgba(58,255,138,0.1)",padding:"8px 12px",borderRadius:8}}>{msg}</div>}
             <div style={{marginBottom:14}}><label style={{fontSize:11,color:"var(--mu)",display:"block",marginBottom:5}}>CÓDIGO</label><input value={code} onChange={e=>setCode(e.target.value)} placeholder="123456" style={{fontSize:24,fontFamily:"var(--fm)",textAlign:"center",letterSpacing:8}}/></div>
             {error&&<div style={{color:"var(--a3)",fontSize:13,marginBottom:12,background:"rgba(255,58,110,0.1)",padding:"8px 12px",borderRadius:8}}>{error}</div>}
-            <button style={{...T.bp,width:"100%",padding:12}} onClick={verifyCode}>Verificar →</button>
-            <button style={{...T.bg,width:"100%",marginTop:8}} onClick={()=>setScreen("forgot")}>← Volver</button>
+            <button style={{...T.bp,width:"100%",padding:12}} onClick={verifyCode}>Verificar -></button>
+            <button style={{...T.bg,width:"100%",marginTop:8}} onClick={()=>setScreen("forgot")}><- Volver</button>
           </div>
         )}
         {screen==="newpass"&&(
           <div style={{...T.card,padding:30}}>
             <div style={{fontFamily:"var(--fd)",fontSize:20,letterSpacing:2,marginBottom:6}}>NUEVA CONTRASEÑA</div>
             <div style={{fontSize:13,color:"var(--mu)",marginBottom:18}}>Elige una nueva contraseña segura.</div>
-            <div style={{marginBottom:12}}><label style={{fontSize:11,color:"var(--mu)",display:"block",marginBottom:5}}>NUEVA CONTRASEÑA</label><input type="password" value={newPass} onChange={e=>setNewPass(e.target.value)} placeholder="••••••••"/></div>
-            <div style={{marginBottom:16}}><label style={{fontSize:11,color:"var(--mu)",display:"block",marginBottom:5}}>CONFIRMAR CONTRASEÑA</label><input type="password" value={newPass2} onChange={e=>setNewPass2(e.target.value)} placeholder="••••••••"/></div>
+            <div style={{marginBottom:12}}><label style={{fontSize:11,color:"var(--mu)",display:"block",marginBottom:5}}>NUEVA CONTRASEÑA</label><input type="password" value={newPass} onChange={e=>setNewPass(e.target.value)} placeholder="????????"/></div>
+            <div style={{marginBottom:16}}><label style={{fontSize:11,color:"var(--mu)",display:"block",marginBottom:5}}>CONFIRMAR CONTRASEÑA</label><input type="password" value={newPass2} onChange={e=>setNewPass2(e.target.value)} placeholder="????????"/></div>
             {error&&<div style={{color:"var(--a3)",fontSize:13,marginBottom:12,background:"rgba(255,58,110,0.1)",padding:"8px 12px",borderRadius:8}}>{error}</div>}
-            <button style={{...T.bp,width:"100%",padding:12}} onClick={saveNewPass}>Guardar contraseña →</button>
+            <button style={{...T.bp,width:"100%",padding:12}} onClick={saveNewPass}>Guardar contraseña -></button>
           </div>
         )}
         <div style={{marginTop:14,padding:12,background:"var(--sf)",borderRadius:8,border:"1px solid var(--br)"}}>
@@ -425,4 +419,3 @@ export function Login({users,onLogin,onUpdateUsers}){
     </div>
   );
 }
-
