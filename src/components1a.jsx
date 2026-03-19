@@ -40,21 +40,21 @@ export const T = {
   ov:{position:"fixed",inset:0,background:"rgba(0,0,0,0.88)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:300,padding:16},
 };
 export const MACHINES = [
-  {id:"squat_rack",name:"Squat Rack",muscles:["Cuádriceps","Glúteos","Isquiotibiales"],emoji:"⬆",color:"#e8ff3a",group:"Piernas"},
-  {id:"smith_machine",name:"Smith Machine",muscles:["Pecho","Hombros","Cuádriceps"],emoji:"★",color:"#3affe8",group:"Multiarticular"},
-  {id:"functional_trainer",name:"Functional Trainer (ILUS)",muscles:["Pecho","Espalda","Hombros","Brazos","Core"],emoji:"⇌",color:"#ff9a3a",group:"Funcional"},
-  {id:"leg_press",name:"Prensa de Piernas",muscles:["Cuádriceps","Glúteos","Isquiotibiales"],emoji:"▶",color:"#e8ff3a",group:"Piernas"},
-  {id:"leg_curl",name:"Leg Curl (ILUS)",muscles:["Isquiotibiales","Gastrocnemios"],emoji:"▶",color:"#ff3a6e",group:"Piernas"},
-  {id:"leg_extension",name:"Leg Extension",muscles:["Cuádriceps"],emoji:"▶",color:"#e8ff3a",group:"Piernas"},
-  {id:"hip_abduction",name:"Abducción/Aducción",muscles:["Glúteo medio","Aductores","Sartorio"],emoji:"◉",color:"#ff3aaa",group:"Piernas"},
-  {id:"cable_cross",name:"Freemotion Cable Cross",muscles:["Pecho","Hombros","Brazos"],emoji:"↻",color:"#3affe8",group:"Funcional"},
-  {id:"lat_pulldown",name:"Polea Alta",muscles:["Dorsal","Bíceps","Romboides"],emoji:"↓",color:"#3affe8",group:"Espalda"},
-  {id:"seated_row",name:"Remo Sentado",muscles:["Dorsal","Trapecio","Bíceps"],emoji:"≈",color:"#3affe8",group:"Espalda"},
-  {id:"hip_thrust_machine",name:"Hip Thrust (máquina)",muscles:["Glúteos","Isquiotibiales"],emoji:"◉",color:"#ff3aaa",group:"Piernas"},
-  {id:"incline_press",name:"Press Inclinado",muscles:["Pecho superior","Hombros","Tríceps"],emoji:"❋",color:"#ff9a3a",group:"Pecho"},
-  {id:"dips",name:"Fondos / Dips",muscles:["Tríceps","Pecho","Hombros"],emoji:"↘",color:"#ff3a6e",group:"Pecho"},
-  {id:"pull_up_bar",name:"Barra de Dominadas",muscles:["Dorsal","Bíceps","Core"],emoji:"↑",color:"#3affe8",group:"Espalda"},
-  {id:"barbell_deadlift",name:"Peso Muerto Barra",muscles:["Isquiotibiales","Glúteos","Espalda baja"],emoji:"⬆",color:"#e8ff3a",group:"Piernas"},
+  {id:"squat_rack",name:"Squat Rack",muscles:["Cuádriceps","Glúteos","Isquiotibiales"],emoji:"UP",color:"#e8ff3a",group:"Piernas"},
+  {id:"smith_machine",name:"Smith Machine",muscles:["Pecho","Hombros","Cuádriceps"],emoji:"*",color:"#3affe8",group:"Multiarticular"},
+  {id:"functional_trainer",name:"Functional Trainer (ILUS)",muscles:["Pecho","Espalda","Hombros","Brazos","Core"],emoji:"<>",color:"#ff9a3a",group:"Funcional"},
+  {id:"leg_press",name:"Prensa de Piernas",muscles:["Cuádriceps","Glúteos","Isquiotibiales"],emoji:">",color:"#e8ff3a",group:"Piernas"},
+  {id:"leg_curl",name:"Leg Curl (ILUS)",muscles:["Isquiotibiales","Gastrocnemios"],emoji:">",color:"#ff3a6e",group:"Piernas"},
+  {id:"leg_extension",name:"Leg Extension",muscles:["Cuádriceps"],emoji:">",color:"#e8ff3a",group:"Piernas"},
+  {id:"hip_abduction",name:"Abducción/Aducción",muscles:["Glúteo medio","Aductores","Sartorio"],emoji:"o",color:"#ff3aaa",group:"Piernas"},
+  {id:"cable_cross",name:"Freemotion Cable Cross",muscles:["Pecho","Hombros","Brazos"],emoji:"R",color:"#3affe8",group:"Funcional"},
+  {id:"lat_pulldown",name:"Polea Alta",muscles:["Dorsal","Bíceps","Romboides"],emoji:"v",color:"#3affe8",group:"Espalda"},
+  {id:"seated_row",name:"Remo Sentado",muscles:["Dorsal","Trapecio","Bíceps"],emoji:"~",color:"#3affe8",group:"Espalda"},
+  {id:"hip_thrust_machine",name:"Hip Thrust (máquina)",muscles:["Glúteos","Isquiotibiales"],emoji:"o",color:"#ff3aaa",group:"Piernas"},
+  {id:"incline_press",name:"Press Inclinado",muscles:["Pecho superior","Hombros","Tríceps"],emoji:"+",color:"#ff9a3a",group:"Pecho"},
+  {id:"dips",name:"Fondos / Dips",muscles:["Tríceps","Pecho","Hombros"],emoji:"\",color:"#ff3a6e",group:"Pecho"},
+  {id:"pull_up_bar",name:"Barra de Dominadas",muscles:["Dorsal","Bíceps","Core"],emoji:"^",color:"#3affe8",group:"Espalda"},
+  {id:"barbell_deadlift",name:"Peso Muerto Barra",muscles:["Isquiotibiales","Glúteos","Espalda baja"],emoji:"UP",color:"#e8ff3a",group:"Piernas"},
 ];
 export const MACHINE_GROUPS = {
   "Piernas":     ["squat_rack","leg_press","leg_curl","leg_extension","hip_abduction","hip_thrust_machine","barbell_deadlift"],
@@ -62,7 +62,7 @@ export const MACHINE_GROUPS = {
   "Espalda":     ["lat_pulldown","seated_row","pull_up_bar"],
   "Multiarticular/Funcional": ["smith_machine","functional_trainer"],
 };
-export const GROUP_ICONS = {"Piernas":"▶","Pecho":"❋","Espalda":"⬆","Multiarticular/Funcional":"⇌"};
+export const GROUP_ICONS = {"Piernas":">","Pecho":"+","Espalda":"UP","Multiarticular/Funcional":"<>"};
 export const GC={Piernas:"#e8ff3a",Pecho:"#ff9a3a",Espalda:"#3affe8",Hombros:"#ff3a6e",Brazos:"#c03aff",Core:"#3aff8a",Funcional:"#ff3aaa",Multiarticular:"#aaffdd"};
 export const MONTHS=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
 export const DEFAULT_PLANS = [
@@ -113,11 +113,11 @@ export function sessionGroups(sess){
   return [...set];
 }
 export function suggestNext(sessions){
-  if(!sessions||!sessions.length) return{machines:MACHINES.slice(0,4),reason:"Primera sesión — comenzamos con lo básico"};
+  if(!sessions||!sessions.length) return{machines:MACHINES.slice(0,4),reason:"Primera sesión - comenzamos con lo básico"};
   const last=sessionGroups(sessions[sessions.length-1]);
   const all=[...new Set(MACHINES.map(m=>m.group))];
   const next=all.filter(g=>!last.includes(g)).slice(0,2);
-  return{machines:MACHINES.filter(m=>next.includes(m.group)).slice(0,4),reason:`Última: ${last.join(", ")} · Siguiente: ${next.join(", ")}`};
+  return{machines:MACHINES.filter(m=>next.includes(m.group)).slice(0,4),reason:`Última: ${last.join(", ")} . Siguiente: ${next.join(", ")}`};
 }
 export function calcNut(p){
   if(!p||!p.height||!p.weight||!p.age) return null;
@@ -139,8 +139,8 @@ export function monthCount(att){
   return(att||[]).filter(d=>d.startsWith(ym)).length;
 }
 export function todayISO(){return new Date().toISOString().slice(0,10);}
-export function fmtCLP(n){return n!=null?`$${n.toLocaleString("es-CL")}`:"—";}
-export function gLbl(g){return{male:"Masculino",female:"Femenino",other:"Prefiero no decir"}[g]||g||"—";}
+export function fmtCLP(n){return n!=null?`$${n.toLocaleString("es-CL")}`:"-";}
+export function gLbl(g){return{male:"Masculino",female:"Femenino",other:"Prefiero no decir"}[g]||g||"-";}
 export function MachineSelect({value, onChange}) {
   return (
     <select value={value} onChange={e=>onChange(e.target.value)}>
@@ -243,7 +243,7 @@ export function ProfileSetup({userName,onSave}){
           ))}
           <div><label style={{fontSize:11,color:"var(--mu)",display:"block",marginBottom:5}}>GÉNERO</label>
             <select value={f.gender} onChange={set("gender")}>
-              <option value="">Seleccionar…</option>
+              <option value="">Seleccionar?</option>
               <option value="male">Masculino</option><option value="female">Femenino</option><option value="other">Prefiero no decir</option>
             </select>
           </div>
@@ -259,9 +259,9 @@ export function ProfileSetup({userName,onSave}){
           </div>
         </div>
         <div style={{marginTop:12}}><label style={{fontSize:11,color:"var(--mu)",display:"block",marginBottom:5}}>RESTRICCIONES (opcional)</label>
-          <input value={f.restrictions} onChange={set("restrictions")} placeholder="Ej: dolor lumbar, rodilla…"/>
+          <input value={f.restrictions} onChange={set("restrictions")} placeholder="Ej: dolor lumbar, rodilla?"/>
         </div>
-        <button style={{...T.bp,width:"100%",marginTop:20,padding:14,opacity:ok?1:0.4,cursor:ok?"pointer":"not-allowed"}} onClick={()=>ok&&onSave(f)}>Guardar y continuar →</button>
+        <button style={{...T.bp,width:"100%",marginTop:20,padding:14,opacity:ok?1:0.4,cursor:ok?"pointer":"not-allowed"}} onClick={()=>ok&&onSave(f)}>Guardar y continuar -></button>
         <button style={{...T.bg,width:"100%",marginTop:8}} onClick={()=>onSave(null)}>Completar más tarde</button>
       </div>
     </div>
@@ -282,9 +282,9 @@ export function SessionModal({session,onClose,onSave,canEdit}){
       <div className="fi" style={{...T.card,width:"100%",maxWidth:560,padding:28,maxHeight:"92vh",overflowY:"auto"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
           <div><div style={{fontFamily:"var(--fd)",fontSize:24,letterSpacing:2}}>SESIÓN</div>
-            <div style={{fontSize:13,color:"var(--mu)"}}>{session.date} · {exs.length} ejercicios</div>
+            <div style={{fontSize:13,color:"var(--mu)"}}>{session.date} . {exs.length} ejercicios</div>
           </div>
-          <button style={T.bg} onClick={onClose}>✕</button>
+          <button style={T.bg} onClick={onClose}>X</button>
         </div>
         <div style={{display:"flex",flexWrap:"wrap",gap:5,marginBottom:14}}>
           {sessionMuscles({exercises:exs}).map(m=><span key={m} style={{...T.tag,background:"rgba(232,255,58,0.1)",color:"var(--ac)"}}>{m}</span>)}
@@ -303,7 +303,7 @@ export function SessionModal({session,onClose,onSave,canEdit}){
                   ))}
                 </div>
                 <div style={{display:"flex",gap:6,marginTop:10}}>
-                  <button style={{...T.bp,fontSize:12,padding:"6px 14px"}} onClick={saveEdit}>✓ Guardar</button>
+                  <button style={{...T.bp,fontSize:12,padding:"6px 14px"}} onClick={saveEdit}>OK Guardar</button>
                   <button style={{...T.bg,fontSize:12}} onClick={()=>setEditId(null)}>Cancelar</button>
                 </div>
               </div>
@@ -315,8 +315,8 @@ export function SessionModal({session,onClose,onSave,canEdit}){
                 <span style={{fontFamily:"var(--fm)",fontSize:13,color:"var(--ac)"}}>{ex.sets}×{ex.reps}</span>
                 <span style={{fontFamily:"var(--fm)",fontSize:13,color:"var(--a2)",minWidth:56,textAlign:"right"}}>{ex.weight} kg</span>
                 {canEdit&&<div style={{display:"flex",gap:4}}>
-                  <button style={{background:"var(--br)",border:"none",borderRadius:6,padding:"4px 8px",color:"var(--tx)",fontSize:12}} onClick={()=>startEdit(ex)}>✎</button>
-                  <button style={T.bd} onClick={()=>delEx(ex.id)}>✕</button>
+                  <button style={{background:"var(--br)",border:"none",borderRadius:6,padding:"4px 8px",color:"var(--tx)",fontSize:12}} onClick={()=>startEdit(ex)}>e</button>
+                  <button style={T.bd} onClick={()=>delEx(ex.id)}>X</button>
                 </div>}
               </div>
             );
@@ -341,7 +341,7 @@ export function SessionModal({session,onClose,onSave,canEdit}){
             </div>
           </div>
         )}
-        {canEdit&&<button style={{...T.bp,width:"100%",marginTop:14,padding:12}} onClick={()=>onSave(exs)}>Guardar cambios →</button>}
+        {canEdit&&<button style={{...T.bp,width:"100%",marginTop:14,padding:12}} onClick={()=>onSave(exs)}>Guardar cambios -></button>}
       </div>
     </div>
   );
