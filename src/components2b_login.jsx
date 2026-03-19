@@ -28,11 +28,11 @@ export function Login({users,onLogin,onUpdateUsers}){
     setGeneratedCode(c);setResetUser(u);
     try{
       await db.sendEmail({type:"reset",to:email,resetCode:c});
-      setMsg(`Código enviado a ${email}`);
+      setMsg("Código enviado a "+email);
       setScreen("verify");
     }catch(e){
       // Show code on screen as fallback
-      setMsg(`(Demo) Tu código es: ${c}`);
+      setMsg("(Demo) Tu código es: "+c);
       setScreen("verify");
     }
     setLoading(false);
@@ -123,4 +123,3 @@ export function Login({users,onLogin,onUpdateUsers}){
     </div>
   );
 }
-
