@@ -25,7 +25,7 @@ export function SessionsTab({user,onUpdateUser,canEdit}){
           </div>
           <div style={{display:"flex",gap:8}}>
             <button style={T.bg} onClick={()=>setNewOpen(false)}>Cancelar</button>
-            <button style={T.bp} onClick={create}>Crear y agregar ejercicios -></button>
+            <button style={T.bp} onClick={create}>Crear y agregar ejercicios &rarr;</button>
           </div>
         </div>
       )}
@@ -42,7 +42,7 @@ export function SessionsTab({user,onUpdateUser,canEdit}){
                 </div>
                 <div style={{display:"flex",gap:6,alignItems:"center"}}>
                   {canEdit&&<button style={{...T.bd,fontSize:11,padding:"4px 8px"}} onClick={e=>{e.stopPropagation();del(s.id);}}>X</button>}
-                  <span style={{fontSize:12,color:"var(--mu)"}}>Ver -></span>
+                  <span style={{fontSize:12,color:"var(--mu)"}}>Ver &rarr;</span>
                 </div>
               </div>
               <div style={{display:"flex",flexWrap:"wrap",gap:4,marginBottom:6}}>
