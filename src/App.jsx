@@ -56,6 +56,14 @@ const MACHINES = [
   {id:"pull_up_bar",name:"Barra de Dominadas",muscles:["Dorsal","Bíceps","Core"],emoji:"🔝",color:"#3affe8",group:"Espalda"},
   {id:"barbell_deadlift",name:"Peso Muerto Barra",muscles:["Isquiotibiales","Glúteos","Espalda baja"],emoji:"🏋️",color:"#e8ff3a",group:"Piernas"},
 ];
+
+const MACHINE_GROUPS = {
+  "Piernas":     ["squat_rack","leg_press","leg_curl","leg_extension","hip_abduction","hip_thrust_machine","barbell_deadlift"],
+  "Pecho":       ["incline_press","dips","cable_cross"],
+  "Espalda":     ["lat_pulldown","seated_row","pull_up_bar"],
+  "Multiarticular/Funcional": ["smith_machine","functional_trainer"],
+};
+const GROUP_ICONS = {"Piernas":"🦵","Pecho":"💪","Espalda":"🏋️","Multiarticular/Funcional":"🔀"};
 const GC={Piernas:"#e8ff3a",Pecho:"#ff9a3a",Espalda:"#3affe8",Hombros:"#ff3a6e",Brazos:"#c03aff",Core:"#3aff8a",Funcional:"#ff3aaa",Multiarticular:"#aaffdd"};
 const MONTHS=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
 
@@ -143,6 +151,18 @@ function todayISO(){return new Date().toISOString().slice(0,10);}
 function fmtCLP(n){return n!=null?`$${n.toLocaleString("es-CL")}`:"—";}
 function gLbl(g){return{male:"Masculino",female:"Femenino",other:"Prefiero no decir"}[g]||g||"—";}
 
+
+function MachineSelect({value, onChange}) {
+  return (
+    <select value={value} onChange={e=>onChange(e.target.value)}>
+      {Object.entries(MACHINE_GROUPS).map(([grp, ids])=>(
+        <optgroup key={grp} label={`${GROUP_ICONS[grp]||""} ${grp}`}>
+          {ids.map(id=>{const m=MACHINES.find(x=>x.id===id);return m?<option key={id} value={id}>{m.emoji} {m.name}</option>:null;})}
+        </optgroup>
+      ))}
+    </select>
+  );
+}
 // ── MINI LINE CHART ───────────────────────────────────────────────────────────
 function MiniLine({data,color="#e8ff3a"}){
   if(!data||!data.length) return <div style={{color:"var(--mu)",fontSize:12,padding:"16px 0"}}>Sin registros</div>;
@@ -270,13 +290,13 @@ function ProfileSetup({userName,onSave}){
 function SessionModal({session,onClose,onSave,canEdit}){
   const[exs,setExs]=useState(session.exercises.map(e=>({...e})));
   const[adding,setAdding]=useState(false);
-  const[newEx,setNewEx]=useState({machineId:MACHINES[0].id,sets:3,reps:10,weight:0});
+  const[newEx,setNewEx]=useState({machineId:MACHINES[0].id,sets:3,reps:10,weight:""});
   const[editId,setEditId]=useState(null);
   const[editD,setEditD]=useState({});
   const startEdit=ex=>{setEditId(ex.id);setEditD({...ex});};
   const saveEdit=()=>{setExs(p=>p.map(e=>e.id===editId?{...editD}:e));setEditId(null);};
   const delEx=id=>setExs(p=>p.filter(e=>e.id!==id));
-  const addEx=()=>{setExs(p=>[...p,{...newEx,id:`e_${Date.now()}`,sets:+newEx.sets,reps:+newEx.reps,weight:+newEx.weight}]);setAdding(false);setNewEx({machineId:MACHINES[0].id,sets:3,reps:10,weight:0});};
+  const addEx=()=>{setExs(p=>[...p,{...newEx,id:`e_${Date.now()}`,sets:+newEx.sets,reps:+newEx.reps,weight:+newEx.weight}]);setAdding(false);setNewEx({machineId:MACHINES[0].id,sets:3,reps:10,weight:""});};
   return(
     <div style={T.ov} onClick={e=>e.target===e.currentTarget&&onClose()}>
       <div className="fi" style={{...T.card,width:"100%",maxWidth:560,padding:28,maxHeight:"92vh",overflowY:"auto"}}>
@@ -294,7 +314,7 @@ function SessionModal({session,onClose,onSave,canEdit}){
             const mc=getMachine(ex.machineId);
             if(editId===ex.id) return(
               <div key={ex.id} style={{padding:12,background:"var(--sf2)",borderRadius:10,border:"1px solid var(--ac)"}}>
-                <div style={{marginBottom:8}}><select value={editD.machineId} onChange={e=>setEditD({...editD,machineId:e.target.value})}>{MACHINES.map(m=><option key={m.id} value={m.id}>{m.emoji} {m.name}</option>)}</select></div>
+                <div style={{marginBottom:8}}><MachineSelect value={editD.machineId} onChange={v=>setEditD({...editD,machineId:v})}/></div>
                 <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8}}>
                   {[["Series","sets"],["Reps","reps"],["Peso kg","weight"]].map(([l,k])=>(
                     <div key={k}><label style={{fontSize:10,color:"var(--mu)",display:"block",marginBottom:3}}>{l}</label>
@@ -326,12 +346,12 @@ function SessionModal({session,onClose,onSave,canEdit}){
         {adding&&(
           <div className="fi" style={{...T.card,marginTop:8,border:"1px solid rgba(232,255,58,0.3)"}}>
             <div style={{marginBottom:8}}><label style={{fontSize:11,color:"var(--mu)",display:"block",marginBottom:4}}>MÁQUINA</label>
-              <select value={newEx.machineId} onChange={e=>setNewEx({...newEx,machineId:e.target.value})}>{MACHINES.map(m=><option key={m.id} value={m.id}>{m.emoji} {m.name}</option>)}</select>
+              <MachineSelect value={newEx.machineId} onChange={v=>setNewEx({...newEx,machineId:v})}/>
             </div>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginBottom:10}}>
               {[["Series","sets","1"],["Reps","reps","1"],["Peso kg","weight","2.5"]].map(([l,k,st])=>(
                 <div key={k}><label style={{fontSize:10,color:"var(--mu)",display:"block",marginBottom:3}}>{l}</label>
-                  <input type="number" value={newEx[k]} step={st} onChange={e=>setNewEx({...newEx,[k]:parseFloat(e.target.value)||0})} style={{padding:"6px 10px",fontSize:13}}/>
+                  <input type="number" value={newEx[k]} step={st} placeholder={k==="weight"?"kg":""} onChange={e=>setNewEx({...newEx,[k]:k==="weight"?e.target.value:parseFloat(e.target.value)||0})} style={{padding:"6px 10px",fontSize:13}}/>
                 </div>
               ))}
             </div>
@@ -418,9 +438,16 @@ function ProformaModal({student,allUsers,plans,gymInfo,onClose}){
   const plan=plans.find(p=>p.id===student.planId);
   const trainer=allUsers.find(u=>u.id===student.trainerId);
   const now=new Date();
-  const sessMonth=monthCount(student.attendance||[]);
+  const defaultStart=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-01`;
+  const lastDay=new Date(now.getFullYear(),now.getMonth()+1,0).getDate();
+  const defaultEnd=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(lastDay).padStart(2,"0")}`;
+  const[startDate,setStartDate]=useState(defaultStart);
+  const[endDate,setEndDate]=useState(defaultEnd);
+  const sessInRange=(student.attendance||[]).filter(d=>d>=startDate&&d<=endDate).length;
+  const pricePerSess=plan&&plan.priceNet&&plan.sessionsPerWeek?Math.round(plan.priceNet/(plan.sessionsPerWeek*4)):null;
+  const netCalc=pricePerSess?pricePerSess*sessInRange:plan&&plan.priceNet?+plan.priceNet:null;
   const proNum=`ET-${now.getFullYear()}${String(now.getMonth()+1).padStart(2,"0")}-${student.uid||"000"}`;
-  const net=plan&&plan.priceNet?+plan.priceNet:null;
+  const net=netCalc;
   const iva=net?Math.round(net*0.19):null;
   const total=net?net+iva:null;
   return(
@@ -434,6 +461,12 @@ function ProformaModal({student,allUsers,plans,gymInfo,onClose}){
           </div>
         </div>
         <div style={{padding:36}}>
+          {/* Date range selector */}
+          <div className="no-print" style={{display:"flex",gap:16,marginBottom:20,padding:14,background:"#f4f4f4",borderRadius:8,alignItems:"flex-end"}}>
+            <div><div style={{fontSize:10,color:"#999",marginBottom:4}}>FECHA INICIO</div><input type="date" value={startDate} onChange={e=>setStartDate(e.target.value)} style={{background:"#fff",border:"1px solid #ddd",color:"#111",fontSize:13,padding:"6px 10px",borderRadius:6,width:"auto"}}/></div>
+            <div><div style={{fontSize:10,color:"#999",marginBottom:4}}>FECHA TÉRMINO</div><input type="date" value={endDate} onChange={e=>setEndDate(e.target.value)} style={{background:"#fff",border:"1px solid #ddd",color:"#111",fontSize:13,padding:"6px 10px",borderRadius:6,width:"auto"}}/></div>
+            <div style={{fontSize:12,color:"#555",paddingBottom:8}}>{sessInRange} sesiones en el período{pricePerSess?` · ${fmtCLP(pricePerSess)}/sesión`:""}</div>
+          </div>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:24,paddingBottom:18,borderBottom:"3px solid #111"}}>
             <div>
               <div style={{fontFamily:"var(--fd)",fontSize:34,letterSpacing:3,color:"#111",lineHeight:1}}>{gymInfo.name}</div>
@@ -475,10 +508,11 @@ function ProformaModal({student,allUsers,plans,gymInfo,onClose}){
             <tbody><tr style={{borderBottom:"1px solid #eee"}}>
               <td style={{padding:"12px 14px"}}>
                 <div style={{fontWeight:600}}>{plan?plan.name:"Plan no asignado"}</div>
-                <div style={{fontSize:11,color:"#888"}}>Entrenamiento personal · {MONTHS[now.getMonth()]} {now.getFullYear()}</div>
+                <div style={{fontSize:11,color:"#888"}}>Entrenamiento personal · {startDate} al {endDate}</div>
+                {pricePerSess&&<div style={{fontSize:11,color:"#888"}}>{fmtCLP(pricePerSess)} por sesión × {sessInRange} sesiones</div>}
               </td>
               <td style={{padding:"12px 14px",textAlign:"center"}}>{plan&&plan.sessionsPerWeek?`${plan.sessionsPerWeek}x`:"—"}</td>
-              <td style={{padding:"12px 14px",textAlign:"center"}}>{sessMonth}</td>
+              <td style={{padding:"12px 14px",textAlign:"center"}}>{sessInRange}</td>
               <td style={{padding:"12px 14px",textAlign:"right",fontWeight:700}}>{net?fmtCLP(net):"A convenir"}</td>
             </tr></tbody>
           </table>
@@ -538,14 +572,25 @@ function StudentDash({user,allUsers,plans,onUpdate,isEmbedded=false}){
 
         {tab==="overview"&&(
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(200px,1fr))",gap:14}}>
-            {[{l:"Sesiones totales",v:sessions.length,i:"🏋️",c:"var(--ac)"},{l:"Días este mes",v:tm,i:"📅",c:"var(--a2)"},{l:"Total asistencias",v:att.length,i:"✅",c:"var(--gr)"},{l:"Plan activo",v:plan?plan.name:"—",i:"⭐",c:"var(--or)"}].map(x=>(
+            {(()=>{
+              const planSess=plan&&plan.sessionsPerWeek?plan.sessionsPerWeek*4:null;
+              const attPct=planSess?Math.round((tm/planSess)*100):null;
+              return [{l:"Sesiones totales",v:sessions.length,i:"🏋️",c:"var(--ac)"},{l:"Días este mes",v:tm,i:"📅",c:"var(--a2)"},{l:"Asistencia mes",v:attPct!=null?`${attPct}%`:`${tm} días`,i:"📊",c:attPct>=80?"var(--gr)":attPct>=50?"var(--or)":"var(--a3)"},{l:"Plan activo",v:plan?plan.name:"—",i:"⭐",c:"var(--or)"}];
+            })().map(x=>(
               <div key={x.l} style={{...T.card,display:"flex",alignItems:"center",gap:12}}>
                 <div style={{fontSize:26}}>{x.i}</div>
                 <div><div style={{fontFamily:"var(--fd)",fontSize:26,color:x.c,lineHeight:1}}>{x.v}</div><div style={{fontSize:12,color:"var(--mu)"}}>{x.l}</div></div>
               </div>
             ))}
             <div style={{...T.card,gridColumn:"span 2",border:"1px solid rgba(232,255,58,0.2)"}}>
-              <div style={{fontSize:11,color:"var(--ac)",fontWeight:700,marginBottom:6,textTransform:"uppercase",letterSpacing:1}}>⚡ Próxima sesión sugerida</div>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
+                <div style={{fontSize:11,color:"var(--ac)",fontWeight:700,textTransform:"uppercase",letterSpacing:1}}>⚡ Próxima sesión sugerida</div>
+                <button style={{...T.bp,fontSize:12,padding:"6px 14px"}} onClick={()=>{
+                  const ns={id:`s_${Date.now()}`,date:todayISO(),exercises:sugg.machines.map((m,i)=>({id:`e_${Date.now()}_${i}`,machineId:m.id,sets:3,reps:10,weight:""}))};
+                  const na=(user.attendance||[]).includes(todayISO())?user.attendance:[...(user.attendance||[]),todayISO()];
+                  onUpdate({...user,sessions:[...(user.sessions||[]),ns],attendance:na});
+                }}>+ Crear esta sesión</button>
+              </div>
               <div style={{fontSize:12,color:"var(--mu)",marginBottom:10}}>{sugg.reason}</div>
               <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
                 {sugg.machines.map(m=>(
@@ -601,32 +646,65 @@ function StudentDash({user,allUsers,plans,onUpdate,isEmbedded=false}){
 
         {tab==="progress"&&(
           <div>
-            <div style={{fontFamily:"var(--fd)",fontSize:20,letterSpacing:2,marginBottom:14,color:"var(--mu)"}}>EVOLUCIÓN DE PESOS POR MÁQUINA</div>
+            <div style={{fontFamily:"var(--fd)",fontSize:20,letterSpacing:2,marginBottom:4,color:"var(--mu)"}}>EVOLUCIÓN SEMANAL</div>
+            <div style={{fontSize:13,color:"var(--mu)",marginBottom:16}}>Filas = ejercicios · Columnas = semanas · Color: 🟢 subió · ⚫ igual · 🔴 bajó</div>
             {machinesWithData.length===0&&<div style={{textAlign:"center",padding:60,color:"var(--mu)"}}>Registra sesiones para ver tu progreso.</div>}
-            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))",gap:14}}>
-              {machinesWithData.map(m=>{
-                const h=weightHist(sessions,m.id),pct=h[0].weight>0?Math.round((h[h.length-1].weight-h[0].weight)/h[0].weight*100):0;
-                return(
-                  <div key={m.id} style={T.card}>
-                    <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
-                      <span style={{fontSize:22}}>{m.emoji}</span>
-                      <div style={{flex:1}}><div style={{fontSize:13,fontWeight:600}}>{m.name}</div><div style={{fontSize:10,color:"var(--mu)"}}>{h.length} registros</div></div>
-                      <div style={{fontFamily:"var(--fm)",fontSize:13,color:pct>=0?"var(--gr)":"var(--a3)"}}>{pct>=0?"+":""}{pct}%</div>
-                    </div>
-                    <MiniLine data={h} color={m.color}/>
-                    <div style={{marginTop:8}}>
-                      {h.slice(-3).reverse().map((r,i)=>(
-                        <div key={i} style={{display:"flex",gap:10,padding:"5px 0",borderBottom:"1px solid var(--br)",fontSize:12}}>
-                          <span style={{color:"var(--mu)",flex:1}}>{r.date}</span>
-                          <span style={{fontFamily:"var(--fm)",color:m.color}}>{r.weight} kg</span>
-                          <span style={{color:"var(--mu)"}}>{r.sets}×{r.reps}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+            {machinesWithData.length>0&&(()=>{
+              // Build weekly buckets
+              const sorted=[...sessions].sort((a,b)=>a.date.localeCompare(b.date));
+              const weekOf=d=>{const dt=new Date(d),day=dt.getDay(),diff=dt.getDate()-day+(day===0?-6:1);const mon=new Date(dt.setDate(diff));return mon.toISOString().slice(0,10);};
+              const weekSet=new Set(sorted.map(s=>weekOf(s.date)));
+              const weeks=[...weekSet].sort().slice(-6);
+              const weekLabels=weeks.map((w,i)=>`Sem ${i+1}`);
+              return(
+                <div style={{overflowX:"auto"}}>
+                  <table style={{minWidth:600,fontSize:12}}>
+                    <thead>
+                      <tr>
+                        <th style={{minWidth:160,position:"sticky",left:0,background:"var(--sf)",zIndex:1}}>Ejercicio</th>
+                        {weeks.map((w,i)=><th key={w} style={{textAlign:"center",minWidth:80,color:"var(--a2)"}}>{weekLabels[i]}<div style={{fontSize:9,color:"var(--mu)",fontWeight:400}}>{w.slice(5)}</div></th>)}
+                        <th style={{textAlign:"center",minWidth:70,color:"var(--ac)"}}>Progreso</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {machinesWithData.map(m=>{
+                        const hist=weightHist(sessions,m.id);
+                        const weekData=weeks.map(w=>{
+                          const sessInWeek=sorted.filter(s=>weekOf(s.date)===w);
+                          const ex=sessInWeek.flatMap(s=>s.exercises).find(e=>e.machineId===m.id);
+                          return ex?+ex.weight:null;
+                        });
+                        const first=weekData.find(v=>v!=null), last=[...weekData].reverse().find(v=>v!=null);
+                        const pct=first&&last&&first>0?Math.round((last-first)/first*100):0;
+                        return(
+                          <tr key={m.id}>
+                            <td style={{position:"sticky",left:0,background:"var(--sf)",zIndex:1}}>
+                              <div style={{display:"flex",alignItems:"center",gap:6}}>
+                                <span style={{fontSize:16}}>{m.emoji}</span>
+                                <div><div style={{fontWeight:600,fontSize:12}}>{m.name}</div><div style={{fontSize:9,color:"var(--mu)"}}>{m.muscles.slice(0,1).join("")}</div></div>
+                              </div>
+                            </td>
+                            {weekData.map((v,i)=>{
+                              const prev=weekData.slice(0,i).reverse().find(x=>x!=null);
+                              const color=v==null?"var(--mu)":prev==null?"var(--tx)":v>prev?"var(--gr)":v<prev?"var(--a3)":"var(--tx)";
+                              const bg=v==null?"transparent":prev==null?"transparent":v>prev?"rgba(58,255,138,0.1)":v<prev?"rgba(255,58,110,0.1)":"transparent";
+                              return(
+                                <td key={i} style={{textAlign:"center",background:bg}}>
+                                  {v!=null?<span style={{fontFamily:"var(--fm)",color,fontWeight:600}}>{v}kg</span>:<span style={{color:"var(--br)"}}>—</span>}
+                                </td>
+                              );
+                            })}
+                            <td style={{textAlign:"center"}}>
+                              <span style={{fontFamily:"var(--fm)",fontSize:13,color:pct>0?"var(--gr)":pct<0?"var(--a3)":"var(--mu)",fontWeight:700}}>{pct>0?"+":""}{first?`${pct}%`:"—"}</span>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              );
+            })()}
           </div>
         )}
 
@@ -824,7 +902,12 @@ function AdminDash({users,onUpdate}){
   }
 
   function startEditPlan(p){setEditingPlanId(p.id);setPlanDraft({...p,priceNet:p.priceNet!=null?String(p.priceNet):"",sessionsPerWeek:p.sessionsPerWeek!=null?String(p.sessionsPerWeek):""});}
-  function savePlan(){setPlans(p=>p.map(x=>x.id===planDraft.id?{...planDraft,priceNet:planDraft.priceNet?+planDraft.priceNet:null,sessionsPerWeek:planDraft.sessionsPerWeek?+planDraft.sessionsPerWeek:null}:x));setEditingPlanId(null);}
+  function savePlan(){
+    const saved={...planDraft,priceNet:planDraft.priceNet?+planDraft.priceNet:null,sessionsPerWeek:planDraft.sessionsPerWeek?+planDraft.sessionsPerWeek:null};
+    setPlans(p=>p.map(x=>x.id===saved.id?saved:x));
+    db.upsertPlan({id:saved.id,name:saved.name,sessions_per_week:saved.sessionsPerWeek,price_net:saved.priceNet}).catch(e=>console.error("Plan save error:",e));
+    setEditingPlanId(null);
+  }
 
   // Finance
   const now=new Date();
@@ -1131,6 +1214,7 @@ function Login({users,onLogin,onUpdateUsers}){
   const[error,setError]=useState("");
   const[msg,setMsg]=useState("");
   const[loading,setLoading]=useState(false);
+  const[showPass,setShowPass]=useState(false);
 
   function handle(){
     const u=users.find(u=>u.username===username&&u.password===password&&u.active!==false);
@@ -1186,7 +1270,13 @@ function Login({users,onLogin,onUpdateUsers}){
         {screen==="login"&&(
           <div style={{...T.card,padding:30}}>
             <div style={{marginBottom:14}}><label style={{fontSize:11,color:"var(--mu)",display:"block",marginBottom:5}}>USUARIO</label><input value={username} onChange={e=>setUsername(e.target.value)} placeholder="tu_usuario" onKeyDown={e=>e.key==="Enter"&&handle()}/></div>
-            <div style={{marginBottom:8}}><label style={{fontSize:11,color:"var(--mu)",display:"block",marginBottom:5}}>CONTRASEÑA</label><input type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="••••••••" onKeyDown={e=>e.key==="Enter"&&handle()}/></div>
+            <div style={{marginBottom:8}}>
+              <label style={{fontSize:11,color:"var(--mu)",display:"block",marginBottom:5}}>CONTRASEÑA</label>
+              <div style={{position:"relative"}}>
+                <input type={showPass?"text":"password"} value={password} onChange={e=>setPassword(e.target.value)} placeholder="••••••••" onKeyDown={e=>e.key==="Enter"&&handle()} style={{paddingRight:44}}/>
+                <button onClick={()=>setShowPass(p=>!p)} style={{position:"absolute",right:10,top:"50%",transform:"translateY(-50%)",background:"none",border:"none",color:"var(--mu)",fontSize:16,cursor:"pointer",padding:4}}>{showPass?"🙈":"👁️"}</button>
+              </div>
+            </div>
             <div style={{textAlign:"right",marginBottom:16}}>
               <span style={{fontSize:12,color:"var(--mu)",cursor:"pointer",textDecoration:"underline"}} onClick={()=>{setScreen("forgot");setError("");setMsg("");}}>¿Olvidaste tu contraseña?</span>
             </div>
