@@ -78,7 +78,7 @@ export function AdminDash({users,onUpdate}){
       </div>
       <div style={{borderBottom:"1px solid var(--br)",padding:"0 24px",display:"flex",overflowX:"auto",background:"var(--sf)"}}>
         {TABS.map(t=>(
-          <button key={t.id} onClick={()=>{setTab(t.id);setViewStudentId(null);}} style={{background:"none",border:"none",padding:"13px 14px",fontSize:13,fontWeight:500,cursor:"pointer",whiteSpace:"nowrap",color:tab===t.id?"var(--ac)":"var(--mu)",borderBottom:`2px solid ${tab===t.id?"var(--ac)":"transparent"}`,transition:"all .2s"}}>{t.i} {t.l}</button>
+          <button key={t.id} onClick={()=>{setTab(t.id);setViewStudentId(null);}} style={{background:"none",border:"none",padding:"13px 14px",fontSize:13,fontWeight:500,cursor:"pointer",whiteSpace:"nowrap",color:tab===t.id?"var(--ac)":"var(--mu)",borderBottom:tab===t.id?"2px solid var(--ac)":"2px solid transparent",transition:"all .2s"}}>{t.i} {t.l}</button>
         ))}
       </div>
       <div style={{padding:24,maxWidth:1100,margin:"0 auto"}} className="fi" key={tab}>
@@ -170,13 +170,13 @@ export function AdminDash({users,onUpdate}){
                           <td style={{fontFamily:"var(--fm)",color:"var(--mu)",fontSize:12}}>@{u.username}</td>
                           <td style={{fontSize:12,color:"var(--mu)"}}>{u.email||"-"}</td>
                           <td><span style={{...T.tag,background:u.role==="trainer"?"rgba(58,255,232,0.12)":"rgba(232,255,58,0.12)",color:u.role==="trainer"?"var(--a2)":"var(--ac)"}}>{u.role==="trainer"?"Entrenador":"Alumno"}</span></td>
-                          <td style={{fontSize:12,color:"var(--mu)"}}>{u.role==="trainer"?`${(u.assignedStudents||[]).length} alumnos`:`${trainer?trainer.name:"Sin coach"} . ${plan?plan.name:"Sin plan"}`}</td>
+                          <td style={{fontSize:12,color:"var(--mu)"}}>{u.role==="trainer"?((u.assignedStudents||[]).length)+" alumnos":(trainer?trainer.name:"Sin coach")+" . "+(plan?plan.name:"Sin plan")}</td>
                           <td><span style={{...T.tag,background:isActive?"rgba(58,255,138,0.12)":"rgba(255,58,110,0.12)",color:isActive?"var(--gr)":"var(--a3)"}}>{isActive?"Activo":"Inactivo"}</span></td>
                           <td style={{fontFamily:"var(--fm)",color:"var(--ac)"}}>{(u.sessions||[]).length}</td>
                           <td><div style={{display:"flex",gap:4,flexWrap:"wrap"}}>
                             <button style={{...T.bw,fontSize:11,padding:"4px 8px"}} onClick={()=>setEditUser({...u})}>e</button>
-                            <button style={{...T.bg,fontSize:11,padding:"4px 8px",color:isActive?"var(--a3)":"var(--gr)",border:`1px solid ${isActive?"rgba(255,58,110,0.3)":"rgba(58,255,138,0.3)"}`}} onClick={()=>toggleActive(u.id)}>{isActive?"on":"off"}</button>
-                            <button style={{...T.bd,fontSize:11,padding:"4px 8px"}} onClick={()=>{if(window.confirm(`?Eliminar a ${u.name}?`))deleteUser(u.id);}}>X</button>
+                            <button style={{...T.bg,fontSize:11,padding:"4px 8px",color:isActive?"var(--a3)":"var(--gr)",border:"1px solid "+(isActive?"rgba(255,58,110,0.3)":"rgba(58,255,138,0.3)")}} onClick={()=>toggleActive(u.id)}>{isActive?"on":"off"}</button>
+                            <button style={{...T.bd,fontSize:11,padding:"4px 8px"}} onClick={()=>{if(window.confirm("Eliminar a " + u.name + "?"))deleteUser(u.id);}}>X</button>
                           </div></td>
                         </tr>
                       );
@@ -197,7 +197,7 @@ export function AdminDash({users,onUpdate}){
                     const plan=plans.find(p=>p.id===s.planId),trainer=users.find(u=>u.id===s.trainerId);
                     const tm=monthCount(s.attendance||[]),att=(s.attendance||[]).includes(today);
                     return(
-                      <div key={s.id} style={{...T.card,cursor:"pointer",border:`1px solid ${att?"rgba(58,255,232,0.3)":"var(--br)"}`}} onClick={()=>setViewStudentId(s.id)}>
+                      <div key={s.id} style={{...T.card,cursor:"pointer",border:"1px solid "+(att?"rgba(58,255,232,0.3)":"var(--br)")}} onClick={()=>setViewStudentId(s.id)}>
                         <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}}>
                           <div><div style={{fontSize:15,fontWeight:700}}>{s.name}</div><div style={{fontSize:11,color:"var(--mu)"}}>{s.uid} . @{s.username}</div></div>
                           <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:4}}>
@@ -254,7 +254,7 @@ export function AdminDash({users,onUpdate}){
                       <div style={{fontSize:11,color:"var(--mu)",marginBottom:4,textTransform:"uppercase",letterSpacing:1}}>{p.id}</div>
                       <div style={{fontSize:16,fontWeight:700,marginBottom:6}}>{p.name}</div>
                       <div style={{fontFamily:"var(--fm)",fontSize:26,color:"var(--ac)",marginBottom:4}}>{p.priceNet?fmtCLP(p.priceNet):"A convenir"}</div>
-                      <div style={{fontSize:12,color:"var(--mu)",marginBottom:12}}>{p.sessionsPerWeek?`${p.sessionsPerWeek} sesiones/semana`:"Flexible"}</div>
+                      <div style={{fontSize:12,color:"var(--mu)",marginBottom:12}}>{p.sessionsPerWeek?p.sessionsPerWeek+" sesiones/semana":"Flexible"}</div>
                       <div style={{fontSize:12,color:"var(--mu)",marginBottom:12}}>Con IVA: <strong style={{color:"var(--tx)"}}>{p.priceNet?fmtCLP(Math.round(p.priceNet*1.19)):"-"}</strong></div>
                       <div style={{fontSize:11,color:"var(--mu)",marginBottom:12}}>Alumnos: <strong style={{color:"var(--a2)"}}>{students.filter(s=>s.planId===p.id).length}</strong></div>
                       <button style={{...T.bw,fontSize:12,padding:"6px 14px"}} onClick={()=>startEditPlan(p)}>e Editar plan</button>
