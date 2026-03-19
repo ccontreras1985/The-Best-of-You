@@ -1,10 +1,7 @@
+export * from "./components1b.jsx";
 import { useState } from "react";
 import { db } from "./supabase.js";
-export * from "./components1b.jsx";
 
-import { useState } from "react";
-import { db } from "./supabase.js";
-export * from "./components1b.jsx";
 
 export function TrainerDash({user,allUsers,plans,onUpdate}){
   const[selId,setSelId]=useState(null);
@@ -196,3 +193,7 @@ export function FinanceDash({users,students,trainers,plans,onUpdate,setProformaS
     </div>
   );
 }
+
+
+
+
