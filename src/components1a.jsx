@@ -261,7 +261,7 @@ export function ProfileSetup({userName,onSave}){
         <div style={{marginTop:12}}><label style={{fontSize:11,color:"var(--mu)",display:"block",marginBottom:5}}>RESTRICCIONES (opcional)</label>
           <input value={f.restrictions} onChange={set("restrictions")} placeholder="Ej: dolor lumbar, rodilla?"/>
         </div>
-        <button style={{...T.bp,width:"100%",marginTop:20,padding:14,opacity:ok?1:0.4,cursor:ok?"pointer":"not-allowed"}} onClick={()=>ok&&onSave(f)}>Guardar y continuar -></button>
+        <button style={{...T.bp,width:"100%",marginTop:20,padding:14,opacity:ok?1:0.4,cursor:ok?"pointer":"not-allowed"}} onClick={()=>ok&&onSave(f)}>Guardar y continuar &rarr;</button>
         <button style={{...T.bg,width:"100%",marginTop:8}} onClick={()=>onSave(null)}>Completar más tarde</button>
       </div>
     </div>
@@ -341,7 +341,7 @@ export function SessionModal({session,onClose,onSave,canEdit}){
             </div>
           </div>
         )}
-        {canEdit&&<button style={{...T.bp,width:"100%",marginTop:14,padding:12}} onClick={()=>onSave(exs)}>Guardar cambios -></button>}
+        {canEdit&&<button style={{...T.bp,width:"100%",marginTop:14,padding:12}} onClick={()=>onSave(exs)}>Guardar cambios &rarr;</button>}
       </div>
     </div>
   );
