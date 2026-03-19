@@ -18,14 +18,14 @@ export function TrainerDash({user,allUsers,plans,onUpdate}){
         <div style={{fontFamily:"var(--fd)",fontSize:22,letterSpacing:2,color:"var(--ac)"}}>ELITE TRAINER</div>
         <div style={{width:1,height:22,background:"var(--br)"}}/>
         <div><div style={{fontSize:14,fontWeight:600}}>{user.name} <span style={{fontFamily:"var(--fm)",fontSize:11,color:"var(--mu)",marginLeft:6}}>{user.uid}</span></div>
-          <div style={{fontSize:11,color:"var(--mu)"}}>Entrenador Personal · {students.length} alumnos</div>
+          <div style={{fontSize:11,color:"var(--mu)"}}>Entrenador Personal . {students.length} alumnos</div>
         </div>
       </div>
       <div style={{padding:24,maxWidth:1080,margin:"0 auto"}}>
         {!sel?(
           <div className="fi">
             <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:14,marginBottom:20}}>
-              {[{l:"Alumnos asignados",v:students.length,c:"var(--ac)",i:"♟"},{l:"Atendidos hoy",v:todaySt.length,c:"var(--a2)",i:"✓"},{l:"Sin asistir hoy",v:students.length-todaySt.length,c:"var(--a3)",i:"◌"}].map(x=>(
+              {[{l:"Alumnos asignados",v:students.length,c:"var(--ac)",i:"i"},{l:"Atendidos hoy",v:todaySt.length,c:"var(--a2)",i:"OK"},{l:"Sin asistir hoy",v:students.length-todaySt.length,c:"var(--a3)",i:"?"}].map(x=>(
                 <div key={x.l} style={{...T.card,display:"flex",alignItems:"center",gap:12}}>
                   <div style={{fontSize:26}}>{x.i}</div>
                   <div><div style={{fontFamily:"var(--fd)",fontSize:32,color:x.c,lineHeight:1}}>{x.v}</div><div style={{fontSize:12,color:"var(--mu)"}}>{x.l}</div></div>
@@ -34,7 +34,7 @@ export function TrainerDash({user,allUsers,plans,onUpdate}){
             </div>
             {todaySt.length>0&&(
               <div style={{...T.card,marginBottom:14,border:"1px solid rgba(58,255,232,0.2)"}}>
-                <div style={{fontSize:11,color:"var(--a2)",fontWeight:700,marginBottom:8,textTransform:"uppercase",letterSpacing:1}}>Hoy en el gym — {today}</div>
+                <div style={{fontSize:11,color:"var(--a2)",fontWeight:700,marginBottom:8,textTransform:"uppercase",letterSpacing:1}}>Hoy en el gym - {today}</div>
                 <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
                   {todaySt.map(s=><div key={s.id} style={{padding:"6px 14px",background:"rgba(58,255,232,0.1)",borderRadius:8,border:"1px solid rgba(58,255,232,0.2)",fontSize:13,color:"var(--a2)"}}>{s.name}</div>)}
                 </div>
@@ -49,10 +49,10 @@ export function TrainerDash({user,allUsers,plans,onUpdate}){
                 return(
                   <div key={s.id} style={{...T.card,cursor:"pointer",border:`1px solid ${att?"rgba(58,255,232,0.3)":"var(--br)"}`}} onClick={()=>setSelId(s.id)}>
                     <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}}>
-                      <div><div style={{fontSize:15,fontWeight:700}}>{s.name}</div><div style={{fontSize:11,color:"var(--mu)"}}>{s.uid} · @{s.username}</div></div>
+                      <div><div style={{fontSize:15,fontWeight:700}}>{s.name}</div><div style={{fontSize:11,color:"var(--mu)"}}>{s.uid} . @{s.username}</div></div>
                       <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:4}}>
                         <span style={{...T.tag,background:"rgba(58,255,232,0.12)",color:"var(--a2)"}}>{plan?plan.name:"Sin plan"}</span>
-                        {att&&<span style={{...T.tag,background:"rgba(58,255,138,0.2)",color:"var(--gr)"}}>✓ Hoy</span>}
+                        {att&&<span style={{...T.tag,background:"rgba(58,255,138,0.2)",color:"var(--gr)"}}>OK Hoy</span>}
                       </div>
                     </div>
                     <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:6,marginBottom:8}}>
@@ -64,7 +64,7 @@ export function TrainerDash({user,allUsers,plans,onUpdate}){
                       ))}
                     </div>
                     {last&&<div style={{fontSize:12,color:"var(--mu)",marginBottom:3}}>Última: <span style={{color:"var(--tx)"}}>{last.date}</span></div>}
-                    <div style={{fontSize:11,color:"var(--ac)",opacity:.8}}>★ Próxima: {sg.machines.slice(0,2).map(m=>m.name).join(" + ")}</div>
+                    <div style={{fontSize:11,color:"var(--ac)",opacity:.8}}>* Próxima: {sg.machines.slice(0,2).map(m=>m.name).join(" + ")}</div>
                   </div>
                 );
               })}
@@ -72,11 +72,11 @@ export function TrainerDash({user,allUsers,plans,onUpdate}){
           </div>
         ):sel&&(
           <div className="fi">
-            <button style={{...T.bg,marginBottom:14}} onClick={()=>setSelId(null)}>← Volver</button>
+            <button style={{...T.bg,marginBottom:14}} onClick={()=>setSelId(null)}><- Volver</button>
             <div style={{...T.card,marginBottom:14,display:"flex",alignItems:"center",gap:12}}>
-              <div style={{fontSize:24}}>♙</div>
+              <div style={{fontSize:24}}>u</div>
               <div><div style={{fontSize:15,fontWeight:700}}>{sel.name} <span style={{fontFamily:"var(--fm)",fontSize:11,color:"var(--mu)"}}>{sel.uid}</span></div>
-                <div style={{fontSize:12,color:"var(--mu)"}}>Vista del entrenador · edición habilitada</div>
+                <div style={{fontSize:12,color:"var(--mu)"}}>Vista del entrenador . edición habilitada</div>
               </div>
             </div>
             <StudentDash user={sel} allUsers={allUsers} plans={plans} onUpdate={handleUpd} isEmbedded={true}/>
@@ -116,9 +116,9 @@ export function FinanceDash({users,students,trainers,plans,onUpdate,setProformaS
   const totalBruto2=Math.round(totalIngresos*1.19);
   return(
     <div>
-      <div style={{fontFamily:"var(--fd)",fontSize:18,letterSpacing:2,color:"var(--mu)",marginBottom:16}}>CONTROL DE GESTIÓN — {MONTHS[now2.getMonth()]} {now2.getFullYear()}</div>
+      <div style={{fontFamily:"var(--fd)",fontSize:18,letterSpacing:2,color:"var(--mu)",marginBottom:16}}>CONTROL DE GESTIÓN - {MONTHS[now2.getMonth()]} {now2.getFullYear()}</div>
       <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:12,marginBottom:22}}>
-        {[{l:"Ingresos netos",v:fmtCLP(totalIngresos),c:"var(--ac)",i:"$"},{l:"Total c/IVA",v:fmtCLP(totalBruto2),c:"var(--gr)",i:"₩"},{l:"Costo coaches",v:fmtCLP(totalCostoCoaches),c:"var(--a3)",i:"✎"},{l:"Margen bruto",v:fmtCLP(margenNeto),c:margenNeto>=0?"var(--gr)":"var(--a3)",i:"↗"},{l:"Sesiones mes",v:totalSessions,c:"var(--a2)",i:"⬆"},{l:"Alumnos activos",v:rows.filter(r=>r.sessM>0).length,c:"var(--or)",i:"♟"}].map(x=>(
+        {[{l:"Ingresos netos",v:fmtCLP(totalIngresos),c:"var(--ac)",i:"$"},{l:"Total c/IVA",v:fmtCLP(totalBruto2),c:"var(--gr)",i:"?"},{l:"Costo coaches",v:fmtCLP(totalCostoCoaches),c:"var(--a3)",i:"e"},{l:"Margen bruto",v:fmtCLP(margenNeto),c:margenNeto>=0?"var(--gr)":"var(--a3)",i:"^"},{l:"Sesiones mes",v:totalSessions,c:"var(--a2)",i:"UP"},{l:"Alumnos activos",v:rows.filter(r=>r.sessM>0).length,c:"var(--or)",i:"i"}].map(x=>(
           <div key={x.l} style={{...T.card,border:`1px solid ${x.c}33`}}>
             <div style={{fontSize:22,marginBottom:4}}>{x.i}</div>
             <div style={{fontFamily:"var(--fd)",fontSize:22,color:x.c,lineHeight:1}}>{x.v}</div>
@@ -138,16 +138,16 @@ export function FinanceDash({users,students,trainers,plans,onUpdate,setProformaS
                   <tr key={s.id}>
                     <td><span style={{fontFamily:"var(--fm)",fontSize:11,color:"var(--ac)"}}>{s.uid}</span></td>
                     <td style={{fontWeight:600}}>{s.name}</td>
-                    <td style={{fontSize:12,color:"var(--mu)"}}>{trainer?trainer.name:"—"}</td>
+                    <td style={{fontSize:12,color:"var(--mu)"}}>{trainer?trainer.name:"-"}</td>
                     <td style={{fontSize:12}}>{plan?plan.name:<span style={{color:"var(--mu)"}}>Sin plan</span>}</td>
-                    <td style={{textAlign:"center",fontFamily:"var(--fm)"}}>{plan&&plan.sessionsPerWeek?`${plan.sessionsPerWeek}x`:"—"}</td>
+                    <td style={{textAlign:"center",fontFamily:"var(--fm)"}}>{plan&&plan.sessionsPerWeek?`${plan.sessionsPerWeek}x`:"-"}</td>
                     <td style={{textAlign:"center",fontFamily:"var(--fm)",color:"var(--a2)"}}>{sessM}{planSess?`/${planSess}`:""}</td>
-                    <td style={{textAlign:"center"}}>{attPct!=null?<span style={{fontFamily:"var(--fm)",color:ac,fontWeight:700}}>{attPct}%</span>:<span style={{color:"var(--mu)"}}>—</span>}</td>
-                    <td style={{fontFamily:"var(--fm)",fontSize:11,color:"var(--mu)"}}>{pricePerSess?fmtCLP(pricePerSess):"—"}</td>
-                    <td style={{fontFamily:"var(--fm)",color:"var(--ac)"}}>{net?fmtCLP(net):"—"}</td>
-                    <td style={{fontFamily:"var(--fm)",color:"var(--or)"}}>{iva?fmtCLP(iva):"—"}</td>
-                    <td style={{fontFamily:"var(--fm)",color:"var(--gr)",fontWeight:700}}>{total?fmtCLP(total):"—"}</td>
-                    <td><button style={{...T.bp,fontSize:11,padding:"5px 10px"}} onClick={()=>setProformaStudent(s)}>☰ Emitir</button></td>
+                    <td style={{textAlign:"center"}}>{attPct!=null?<span style={{fontFamily:"var(--fm)",color:ac,fontWeight:700}}>{attPct}%</span>:<span style={{color:"var(--mu)"}}>-</span>}</td>
+                    <td style={{fontFamily:"var(--fm)",fontSize:11,color:"var(--mu)"}}>{pricePerSess?fmtCLP(pricePerSess):"-"}</td>
+                    <td style={{fontFamily:"var(--fm)",color:"var(--ac)"}}>{net?fmtCLP(net):"-"}</td>
+                    <td style={{fontFamily:"var(--fm)",color:"var(--or)"}}>{iva?fmtCLP(iva):"-"}</td>
+                    <td style={{fontFamily:"var(--fm)",color:"var(--gr)",fontWeight:700}}>{total?fmtCLP(total):"-"}</td>
+                    <td><button style={{...T.bp,fontSize:11,padding:"5px 10px"}} onClick={()=>setProformaStudent(s)}>? Emitir</button></td>
                   </tr>
                 );
               })}
@@ -164,13 +164,13 @@ export function FinanceDash({users,students,trainers,plans,onUpdate,setProformaS
               <div>
                 <div style={{fontSize:15,fontWeight:700}}>{coach.name} <span style={{fontFamily:"var(--fm)",fontSize:11,color:"var(--mu)"}}>{coach.uid}</span></div>
                 <div style={{fontSize:12,color:"var(--mu)"}}>
-                  {totalSess} sesiones · <span style={{color:"var(--or)"}}>{fmtCLP(rate)}/sesión</span>
-                  {" "}<span style={{cursor:"pointer",color:"var(--mu)",fontSize:11,textDecoration:"underline"}} onClick={()=>{const nr=prompt(`Tarifa por sesión de ${coach.name} (CLP):`,String(rate));if(nr&&!isNaN(+nr)){onUpdate([...users.filter(u=>u.id!==coach.id),{...coach,sessionRate:+nr}]);}}}>✎ editar</span>
+                  {totalSess} sesiones . <span style={{color:"var(--or)"}}>{fmtCLP(rate)}/sesión</span>
+                  {" "}<span style={{cursor:"pointer",color:"var(--mu)",fontSize:11,textDecoration:"underline"}} onClick={()=>{const nr=prompt(`Tarifa por sesión de ${coach.name} (CLP):`,String(rate));if(nr&&!isNaN(+nr)){onUpdate([...users.filter(u=>u.id!==coach.id),{...coach,sessionRate:+nr}]);}}}>e editar</span>
                 </div>
               </div>
               <div style={{textAlign:"right"}}>
                 <div style={{fontFamily:"var(--fd)",fontSize:24,color:"var(--a3)"}}>{fmtCLP(coachCost)}</div>
-                <div style={{fontSize:11,color:"var(--mu)"}}>a pagar · Margen: <span style={{color:"var(--gr)"}}>{fmtCLP(coachIncome-coachCost)}</span></div>
+                <div style={{fontSize:11,color:"var(--mu)"}}>a pagar . Margen: <span style={{color:"var(--gr)"}}>{fmtCLP(coachIncome-coachCost)}</span></div>
               </div>
             </div>
             <div style={{overflowX:"auto"}}>
@@ -181,8 +181,8 @@ export function FinanceDash({users,students,trainers,plans,onUpdate,setProformaS
                     <tr key={s.id}>
                       <td style={{fontWeight:600}}>{s.name}</td>
                       <td style={{textAlign:"center",fontFamily:"var(--fm)",color:"var(--a2)"}}>{sessM}</td>
-                      <td style={{fontFamily:"var(--fm)",color:"var(--mu)"}}>{pricePerSess?fmtCLP(pricePerSess):"—"}</td>
-                      <td style={{fontFamily:"var(--fm)",color:"var(--ac)"}}>{net?fmtCLP(net):"—"}</td>
+                      <td style={{fontFamily:"var(--fm)",color:"var(--mu)"}}>{pricePerSess?fmtCLP(pricePerSess):"-"}</td>
+                      <td style={{fontFamily:"var(--fm)",color:"var(--ac)"}}>{net?fmtCLP(net):"-"}</td>
                       <td style={{fontFamily:"var(--fm)",color:"var(--a3)"}}>{fmtCLP(rate*sessM)}</td>
                       <td style={{fontFamily:"var(--fm)",color:(net||0)-rate*sessM>=0?"var(--gr)":"var(--a3)",fontWeight:700}}>{fmtCLP((net||0)-rate*sessM)}</td>
                     </tr>
