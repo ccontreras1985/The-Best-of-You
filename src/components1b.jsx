@@ -9,7 +9,7 @@ export function SessionsTab({user,onUpdateUser,canEdit}){
   const sessions=user.sessions||[];
   function save(sid,exs){onUpdateUser({...user,sessions:sessions.map(s=>s.id===sid?{...s,exercises:exs}:s)});setViewId(null);}
   function del(id){const s=sessions.find(x=>x.id===id);onUpdateUser({...user,sessions:sessions.filter(x=>x.id!==id),attendance:(user.attendance||[]).filter(d=>d!==(s?s.date:""))});}
-  function create(){const ns={id:`s_${Date.now()}`,date:newDate,exercises:[]};const na=(user.attendance||[]).includes(newDate)?user.attendance:[...(user.attendance||[]),newDate];onUpdateUser({...user,sessions:[...sessions,ns],attendance:na});setNewOpen(false);setViewId(ns.id);}
+  function create(){const ns={id:"s_"+(Date.now())+"",date:newDate,exercises:[]};const na=(user.attendance||[]).includes(newDate)?user.attendance:[...(user.attendance||[]),newDate];onUpdateUser({...user,sessions:[...sessions,ns],attendance:na});setNewOpen(false);setViewId(ns.id);}
   const viewSess=viewId?sessions.find(s=>s.id===viewId):null;
   return(
     <div>
@@ -46,7 +46,7 @@ export function SessionsTab({user,onUpdateUser,canEdit}){
                 </div>
               </div>
               <div style={{display:"flex",flexWrap:"wrap",gap:4,marginBottom:6}}>
-                {groups.map(g=><span key={g} style={{...T.tag,background:`${GC[g]||"#555"}22`,color:GC[g]||"var(--mu)",fontSize:10}}>{g}</span>)}
+                {groups.map(g=><span key={g} style={{...T.tag,background:(GC[g]||"#555")+"22",color:GC[g]||"var(--mu)",fontSize:10}}>{g}</span>)}
               </div>
               <div style={{display:"flex",flexWrap:"wrap",gap:5}}>
                 {s.exercises.length===0&&<span style={{fontSize:12,color:"var(--mu)"}}>Sin ejercicios - haz click para agregar</span>}
@@ -70,15 +70,15 @@ export function ProformaModal({student,allUsers,plans,gymInfo,onClose}){
   const plan=plans.find(p=>p.id===student.planId);
   const trainer=allUsers.find(u=>u.id===student.trainerId);
   const now=new Date();
-  const defaultStart=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-01`;
+  const defaultStart=""+(now.getFullYear())+"-${String(now.getMonth()+1).padStart(2,"0")}-01";
   const lastDay=new Date(now.getFullYear(),now.getMonth()+1,0).getDate();
-  const defaultEnd=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(lastDay).padStart(2,"0")}`;
+  const defaultEnd=""+(now.getFullYear())+"-${String(now.getMonth()+1).padStart(2,"0")}-${String(lastDay).padStart(2,"0")}";
   const[startDate,setStartDate]=useState(defaultStart);
   const[endDate,setEndDate]=useState(defaultEnd);
   const sessInRange=(student.attendance||[]).filter(d=>d>=startDate&&d<=endDate).length;
   const pricePerSess=plan&&plan.priceNet&&plan.sessionsPerWeek?Math.round(plan.priceNet/(plan.sessionsPerWeek*4)):null;
   const netCalc=pricePerSess?pricePerSess*sessInRange:plan&&plan.priceNet?+plan.priceNet:null;
-  const proNum=`ET-${now.getFullYear()}${String(now.getMonth()+1).padStart(2,"0")}-${student.uid||"000"}`;
+  const proNum="ET-"+(now.getFullYear())+"${String(now.getMonth()+1).padStart(2,"0")}-${student.uid||"000"}";
   const net=netCalc;
   const iva=net?Math.round(net*0.19):null;
   const total=net?net+iva:null;
@@ -96,7 +96,7 @@ export function ProformaModal({student,allUsers,plans,gymInfo,onClose}){
                     <div className="no-print" style={{display:"flex",gap:16,marginBottom:20,padding:14,background:"#f4f4f4",borderRadius:8,alignItems:"flex-end"}}>
             <div><div style={{fontSize:10,color:"#999",marginBottom:4}}>FECHA INICIO</div><input type="date" value={startDate} onChange={e=>setStartDate(e.target.value)} style={{background:"#fff",border:"1px solid #ddd",color:"#111",fontSize:13,padding:"6px 10px",borderRadius:6,width:"auto"}}/></div>
             <div><div style={{fontSize:10,color:"#999",marginBottom:4}}>FECHA TÉRMINO</div><input type="date" value={endDate} onChange={e=>setEndDate(e.target.value)} style={{background:"#fff",border:"1px solid #ddd",color:"#111",fontSize:13,padding:"6px 10px",borderRadius:6,width:"auto"}}/></div>
-            <div style={{fontSize:12,color:"#555",paddingBottom:8}}>{sessInRange} sesiones en el período{pricePerSess?` . ${fmtCLP(pricePerSess)}/sesión`:""}</div>
+            <div style={{fontSize:12,color:"#555",paddingBottom:8}}>{sessInRange} sesiones en el período{pricePerSess?" . "+(fmtCLP(pricePerSess))+"/sesión":""}</div>
           </div>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:24,paddingBottom:18,borderBottom:"3px solid #111"}}>
             <div>
@@ -123,7 +123,7 @@ export function ProformaModal({student,allUsers,plans,gymInfo,onClose}){
             <div style={{padding:14,background:"#f8f8f8",borderRadius:8,border:"1px solid #eee"}}>
               <div style={{fontSize:10,color:"#999",fontWeight:700,textTransform:"uppercase",letterSpacing:1,marginBottom:8}}>Resumen del mes</div>
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
-                {[["Plan",plan?plan.name:"Sin plan"],["Ses/semana",plan&&plan.sessionsPerWeek?`${plan.sessionsPerWeek}x`:"-"],["Asistencias",`${sessMonth} días`],["Sesiones totales",`${(student.sessions||[]).length}`]].map(([k,v])=>(
+                {[["Plan",plan?plan.name:"Sin plan"],["Ses/semana",plan&&plan.sessionsPerWeek?""+(plan.sessionsPerWeek)+"x":"-"],["Asistencias",""+(sessMonth)+" días"],["Sesiones totales",""+((student.sessions||[]).length)+""]].map(([k,v])=>(
                   <div key={k}><div style={{fontSize:10,color:"#999"}}>{k}</div><div style={{fontSize:13,fontWeight:600}}>{v}</div></div>
                 ))}
               </div>
@@ -142,7 +142,7 @@ export function ProformaModal({student,allUsers,plans,gymInfo,onClose}){
                 <div style={{fontSize:11,color:"#888"}}>Entrenamiento personal . {startDate} al {endDate}</div>
                 {pricePerSess&&<div style={{fontSize:11,color:"#888"}}>{fmtCLP(pricePerSess)} por sesión × {sessInRange} sesiones</div>}
               </td>
-              <td style={{padding:"12px 14px",textAlign:"center"}}>{plan&&plan.sessionsPerWeek?`${plan.sessionsPerWeek}x`:"-"}</td>
+              <td style={{padding:"12px 14px",textAlign:"center"}}>{plan&&plan.sessionsPerWeek?""+(plan.sessionsPerWeek)+"x":"-"}</td>
               <td style={{padding:"12px 14px",textAlign:"center"}}>{sessInRange}</td>
               <td style={{padding:"12px 14px",textAlign:"right",fontWeight:700}}>{net?fmtCLP(net):"A convenir"}</td>
             </tr></tbody>
@@ -188,13 +188,13 @@ export function StudentDash({user,allUsers,plans,onUpdate,isEmbedded=false}){
           <div style={{width:1,height:22,background:"var(--br)"}}/>
           <div>
             <div style={{fontSize:14,fontWeight:600}}>{user.name} <span style={{fontFamily:"var(--fm)",fontSize:11,color:"var(--mu)",marginLeft:6}}>{user.uid}</span></div>
-            <div style={{fontSize:11,color:"var(--mu)"}}>Alumno{trainer?` . Coach: ${trainer.name}`:""}{plan?` . ${plan.name}`:""}</div>
+            <div style={{fontSize:11,color:"var(--mu)"}}>Alumno{trainer?" . Coach: "+(trainer.name)+"":""}{plan?" . "+(plan.name)+"":""}</div>
           </div>
         </div>
       )}
       <div style={{borderBottom:"1px solid var(--br)",padding:"0 24px",display:"flex",overflowX:"auto",background:isEmbedded?"transparent":"var(--sf)"}}>
         {TABS.map(t=>(
-          <button key={t.id} onClick={()=>setTab(t.id)} style={{background:"none",border:"none",padding:"13px 14px",fontSize:13,fontWeight:500,cursor:"pointer",whiteSpace:"nowrap",color:tab===t.id?"var(--ac)":"var(--mu)",borderBottom:`2px solid ${tab===t.id?"var(--ac)":"transparent"}`,transition:"all .2s"}}>{t.i} {t.l}</button>
+          <button key={t.id} onClick={()=>setTab(t.id)} style={{background:"none",border:"none",padding:"13px 14px",fontSize:13,fontWeight:500,cursor:"pointer",whiteSpace:"nowrap",color:tab===t.id?"var(--ac)":"var(--mu)",borderBottom:"2px solid "+(tab===t.id?"var(--ac)":"transparent")+"",transition:"all .2s"}}>{t.i} {t.l}</button>
         ))}
       </div>
       <div style={{padding:24,maxWidth:1080,margin:"0 auto"}} className="fi" key={tab}>
@@ -203,7 +203,7 @@ export function StudentDash({user,allUsers,plans,onUpdate,isEmbedded=false}){
             {(()=>{
               const planSess=plan&&plan.sessionsPerWeek?plan.sessionsPerWeek*4:null;
               const attPct=planSess?Math.round((tm/planSess)*100):null;
-              return [{l:"Sesiones totales",v:sessions.length,i:"UP",c:"var(--ac)"},{l:"Días este mes",v:tm,i:"?",c:"var(--a2)"},{l:"Asistencia mes",v:attPct!=null?`${attPct}%`:`${tm} días`,i:"?",c:attPct>=80?"var(--gr)":attPct>=50?"var(--or)":"var(--a3)"},{l:"Plan activo",v:plan?plan.name:"-",i:"*",c:"var(--or)"}];
+              return [{l:"Sesiones totales",v:sessions.length,i:"UP",c:"var(--ac)"},{l:"Días este mes",v:tm,i:"?",c:"var(--a2)"},{l:"Asistencia mes",v:attPct!=null?""+(attPct)+"%":""+(tm)+" días",i:"?",c:attPct>=80?"var(--gr)":attPct>=50?"var(--or)":"var(--a3)"},{l:"Plan activo",v:plan?plan.name:"-",i:"*",c:"var(--or)"}];
             })().map(x=>(
               <div key={x.l} style={{...T.card,display:"flex",alignItems:"center",gap:12}}>
                 <div style={{fontSize:26}}>{x.i}</div>
@@ -214,7 +214,7 @@ export function StudentDash({user,allUsers,plans,onUpdate,isEmbedded=false}){
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
                 <div style={{fontSize:11,color:"var(--ac)",fontWeight:700,textTransform:"uppercase",letterSpacing:1}}>* Próxima sesión sugerida</div>
                 <button style={{...T.bp,fontSize:12,padding:"6px 14px"}} onClick={()=>{
-                  const ns={id:`s_${Date.now()}`,date:todayISO(),exercises:sugg.machines.map((m,i)=>({id:`e_${Date.now()}_${i}`,machineId:m.id,sets:3,reps:10,weight:""}))};
+                  const ns={id:"s_"+(Date.now())+"",date:todayISO(),exercises:sugg.machines.map((m,i)=>({id:"e_"+(Date.now())+"_${i}",machineId:m.id,sets:3,reps:10,weight:""}))};
                   const na=(user.attendance||[]).includes(todayISO())?user.attendance:[...(user.attendance||[]),todayISO()];
                   onUpdate({...user,sessions:[...(user.sessions||[]),ns],attendance:na});
                 }}>+ Crear esta sesión</button>
@@ -261,7 +261,7 @@ export function StudentDash({user,allUsers,plans,onUpdate,isEmbedded=false}){
                   <div key={s.id} style={{display:"flex",alignItems:"center",gap:10,padding:"8px 0",borderBottom:"1px solid var(--br)"}}>
                     <span style={{fontFamily:"var(--fm)",fontSize:11,color:"var(--mu)",minWidth:80}}>{s.date}</span>
                     <div style={{display:"flex",flexWrap:"wrap",gap:4}}>
-                      {sessionGroups(s).map(g=><span key={g} style={{...T.tag,background:`${GC[g]||"#555"}20`,color:GC[g]||"var(--mu)",fontSize:10}}>{g}</span>)}
+                      {sessionGroups(s).map(g=><span key={g} style={{...T.tag,background:(GC[g]||"#555")+"20",color:GC[g]||"var(--mu)",fontSize:10}}>{g}</span>)}
                     </div>
                   </div>
                 ))}
@@ -280,7 +280,7 @@ export function StudentDash({user,allUsers,plans,onUpdate,isEmbedded=false}){
               const weekOf=d=>{const dt=new Date(d),day=dt.getDay(),diff=dt.getDate()-day+(day===0?-6:1);const mon=new Date(dt.setDate(diff));return mon.toISOString().slice(0,10);};
               const weekSet=new Set(sorted.map(s=>weekOf(s.date)));
               const weeks=[...weekSet].sort().slice(-6);
-              const weekLabels=weeks.map((w,i)=>`Sem ${i+1}`);
+              const weekLabels=weeks.map((w,i)=>"Sem "+(i+1));
               return(
                 <div style={{overflowX:"auto"}}>
                   <table style={{minWidth:600,fontSize:12}}>
@@ -320,7 +320,7 @@ export function StudentDash({user,allUsers,plans,onUpdate,isEmbedded=false}){
                               );
                             })}
                             <td style={{textAlign:"center"}}>
-                              <span style={{fontFamily:"var(--fm)",fontSize:13,color:pct>0?"var(--gr)":pct<0?"var(--a3)":"var(--mu)",fontWeight:700}}>{pct>0?"+":""}{first?`${pct}%`:"-"}</span>
+                              <span style={{fontFamily:"var(--fm)",fontSize:13,color:pct>0?"var(--gr)":pct<0?"var(--a3)":"var(--mu)",fontWeight:700}}>{pct>0?"+":""}{first?""+(pct)+"%":"-"}</span>
                             </td>
                           </tr>
                         );
@@ -337,7 +337,7 @@ export function StudentDash({user,allUsers,plans,onUpdate,isEmbedded=false}){
             <div style={{...T.card,marginBottom:14}}>
               <div style={{fontSize:11,color:"var(--mu)",fontWeight:700,marginBottom:12,textTransform:"uppercase",letterSpacing:1}}>Tu perfil</div>
               <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10}}>
-                {[["Altura",`${prof.height||"-"} cm`],["Peso",`${prof.weight||"-"} kg`],["Edad",`${prof.age||"-"} años`],["Género",gLbl(prof.gender)],["Objetivo",prof.goal||"-"],["Actividad",prof.activityLevel||"-"]].map(([k,v])=>(
+                {[["Altura",(prof.height||"-")+" cm"],["Peso",(prof.weight||"-")+" kg"],["Edad",""+(prof.age||"-")+" años"],["Género",gLbl(prof.gender)],["Objetivo",prof.goal||"-"],["Actividad",prof.activityLevel||"-"]].map(([k,v])=>(
                   <div key={k} style={{padding:10,background:"var(--sf2)",borderRadius:8}}><div style={{fontSize:10,color:"var(--mu)",marginBottom:3}}>{k.toUpperCase()}</div><div style={{fontSize:14,fontWeight:600}}>{v}</div></div>
                 ))}
               </div>
