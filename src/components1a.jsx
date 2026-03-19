@@ -99,8 +99,8 @@ export const INIT_USERS = [
     ]},
 ];
 let _uidCount = 4;
-export const newUid = () => `ET-${String(++_uidCount).padStart(3,"0")}`;
-export const newId  = () => `u_${Date.now()}`;
+export const newUid = () => "ET-"+(String(++_uidCount).padStart(3,"0"))+"";
+export const newId  = () => "u_"+(Date.now())+"";
 export const getMachine = id => MACHINES.find(m => m.id === id);
 export function sessionMuscles(sess){
   const set=new Set();
@@ -117,7 +117,7 @@ export function suggestNext(sessions){
   const last=sessionGroups(sessions[sessions.length-1]);
   const all=[...new Set(MACHINES.map(m=>m.group))];
   const next=all.filter(g=>!last.includes(g)).slice(0,2);
-  return{machines:MACHINES.filter(m=>next.includes(m.group)).slice(0,4),reason:`Última: ${last.join(", ")} . Siguiente: ${next.join(", ")}`};
+  return{machines:MACHINES.filter(m=>next.includes(m.group)).slice(0,4),reason:"Última: "+(last.join(", "))+" . Siguiente: ${next.join(", ")}"};
 }
 export function calcNut(p){
   if(!p||!p.height||!p.weight||!p.age) return null;
@@ -135,17 +135,17 @@ export function weightHist(sessions,mid){
     .sort((a,b)=>a.date.localeCompare(b.date));
 }
 export function monthCount(att){
-  const n=new Date(),ym=`${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}`;
+  const n=new Date(),ym=""+(n.getFullYear())+"-${String(n.getMonth()+1).padStart(2,"0")}";
   return(att||[]).filter(d=>d.startsWith(ym)).length;
 }
 export function todayISO(){return new Date().toISOString().slice(0,10);}
-export function fmtCLP(n){return n!=null?`$${n.toLocaleString("es-CL")}`:"-";}
+export function fmtCLP(n){return n!=null?"$"+n.toLocaleString("es-CL"):"-";}
 export function gLbl(g){return{male:"Masculino",female:"Femenino",other:"Prefiero no decir"}[g]||g||"-";}
 export function MachineSelect({value, onChange}) {
   return (
     <select value={value} onChange={e=>onChange(e.target.value)}>
       {Object.entries(MACHINE_GROUPS).map(([grp, ids])=>(
-        <optgroup key={grp} label={`${GROUP_ICONS[grp]||""} ${grp}`}>
+        <optgroup key={grp} label={""+(GROUP_ICONS[grp]||"")+" ${grp}"}>
           {ids.map(id=>{const m=MACHINES.find(x=>x.id===id);return m?<option key={id} value={id}>{m.emoji} {m.name}</option>:null;})}
         </optgroup>
       ))}
@@ -196,7 +196,7 @@ export function MuscleRadar({sessions}){
               <span style={{fontFamily:"var(--fm)",fontSize:11,color:"var(--mu)"}}>{v} series</span>
             </div>
             <div style={{height:5,background:"var(--sf2)",borderRadius:3,overflow:"hidden"}}>
-              <div style={{height:"100%",width:`${(v/mx)*100}%`,background:GC[g]||"var(--ac)",borderRadius:3}}/>
+              <div style={{height:"100%",width:((v/mx)*100)+"%",background:GC[g]||"var(--ac)",borderRadius:3}}/>
             </div>
           </div>
         ))}
@@ -209,7 +209,7 @@ export function AttCal({attendance}){
   const dim=new Date(y,mo+1,0).getDate(),fd=new Date(y,mo,1).getDay(),attSet=new Set(attendance);
   const cells=[];
   for(let i=0;i<fd;i++)cells.push(null);
-  for(let d=1;d<=dim;d++){const ds=`${y}-${String(mo+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;cells.push({day:d,att:attSet.has(ds),today:d===now.getDate()});}
+  for(let d=1;d<=dim;d++){const ds=""+(y)+"-${String(mo+1).padStart(2,"0")}-${String(d).padStart(2,"0")}";cells.push({day:d,att:attSet.has(ds),today:d===now.getDate()});}
   return(
     <div>
       <div style={{fontSize:12,fontWeight:600,color:"var(--mu)",marginBottom:8,textTransform:"uppercase",letterSpacing:1}}>{MONTHS[mo]} {y}</div>
@@ -276,7 +276,7 @@ export function SessionModal({session,onClose,onSave,canEdit}){
   const startEdit=ex=>{setEditId(ex.id);setEditD({...ex});};
   const saveEdit=()=>{setExs(p=>p.map(e=>e.id===editId?{...editD}:e));setEditId(null);};
   const delEx=id=>setExs(p=>p.filter(e=>e.id!==id));
-  const addEx=()=>{setExs(p=>[...p,{...newEx,id:`e_${Date.now()}`,sets:+newEx.sets,reps:+newEx.reps,weight:+newEx.weight}]);setAdding(false);setNewEx({machineId:MACHINES[0].id,sets:3,reps:10,weight:""});};
+  const addEx=()=>{setExs(p=>[...p,{...newEx,id:"e_"+(Date.now())+"",sets:+newEx.sets,reps:+newEx.reps,weight:+newEx.weight}]);setAdding(false);setNewEx({machineId:MACHINES[0].id,sets:3,reps:10,weight:""});};
   return(
     <div style={T.ov} onClick={e=>e.target===e.currentTarget&&onClose()}>
       <div className="fi" style={{...T.card,width:"100%",maxWidth:560,padding:28,maxHeight:"92vh",overflowY:"auto"}}>
