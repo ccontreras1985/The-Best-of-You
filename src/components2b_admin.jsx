@@ -1,4 +1,6 @@
 export * from "./components2a.jsx";
+import { useState } from "react";
+import { db } from "./supabase.js";
 
 export function AdminDash({users,onUpdate}){
   const[tab,setTab]=useState("users");
