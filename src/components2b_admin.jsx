@@ -295,7 +295,6 @@ export function AdminDash({users,onUpdate}){
       {profUser&&<ProfileSetup userName={profUser.name} onSave={p=>{if(p)onUpdate(users.map(u=>u.id===profUser.id?{...u,profile:p}:u));setProfUser(null);}}/>}
       {proformaStudent&&<ProformaModal student={proformaStudent} allUsers={users} plans={plans} gymInfo={gymInfo} onClose={()=>setProformaStudent(null)}/>}
     </div>
-  </div>
   );
 }
 
