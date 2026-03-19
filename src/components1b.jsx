@@ -25,7 +25,7 @@ export function SessionsTab({user,onUpdateUser,canEdit}){
           </div>
           <div style={{display:"flex",gap:8}}>
             <button style={T.bg} onClick={()=>setNewOpen(false)}>Cancelar</button>
-            <button style={T.bp} onClick={create}>Crear y agregar ejercicios →</button>
+            <button style={T.bp} onClick={create}>Crear y agregar ejercicios -></button>
           </div>
         </div>
       )}
@@ -41,15 +41,15 @@ export function SessionsTab({user,onUpdateUser,canEdit}){
                   <span style={{fontSize:12,color:"var(--mu)"}}>{s.exercises.length} ejercicios</span>
                 </div>
                 <div style={{display:"flex",gap:6,alignItems:"center"}}>
-                  {canEdit&&<button style={{...T.bd,fontSize:11,padding:"4px 8px"}} onClick={e=>{e.stopPropagation();del(s.id);}}>✕</button>}
-                  <span style={{fontSize:12,color:"var(--mu)"}}>Ver →</span>
+                  {canEdit&&<button style={{...T.bd,fontSize:11,padding:"4px 8px"}} onClick={e=>{e.stopPropagation();del(s.id);}}>X</button>}
+                  <span style={{fontSize:12,color:"var(--mu)"}}>Ver -></span>
                 </div>
               </div>
               <div style={{display:"flex",flexWrap:"wrap",gap:4,marginBottom:6}}>
                 {groups.map(g=><span key={g} style={{...T.tag,background:`${GC[g]||"#555"}22`,color:GC[g]||"var(--mu)",fontSize:10}}>{g}</span>)}
               </div>
               <div style={{display:"flex",flexWrap:"wrap",gap:5}}>
-                {s.exercises.length===0&&<span style={{fontSize:12,color:"var(--mu)"}}>Sin ejercicios — haz click para agregar</span>}
+                {s.exercises.length===0&&<span style={{fontSize:12,color:"var(--mu)"}}>Sin ejercicios - haz click para agregar</span>}
                 {s.exercises.map(ex=>{const m=getMachine(ex.machineId);return(
                   <div key={ex.id} style={{fontSize:12,background:"var(--sf2)",padding:"4px 9px",borderRadius:8,display:"flex",gap:5,alignItems:"center"}}>
                     <span>{m?m.emoji:"?"}</span><span style={{color:"var(--mu)"}}>{m?m.name:ex.machineId}</span>
@@ -86,29 +86,28 @@ export function ProformaModal({student,allUsers,plans,gymInfo,onClose}){
     <div style={T.ov} onClick={e=>e.target===e.currentTarget&&onClose()}>
       <div className="fi" style={{width:"100%",maxWidth:660,maxHeight:"92vh",overflowY:"auto",borderRadius:12,background:"#fff",color:"#111",position:"relative"}}>
         <div className="no-print" style={{padding:"12px 20px",background:"#f4f4f4",borderBottom:"1px solid #ddd",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-          <span style={{fontSize:13,fontWeight:700,color:"#333"}}>PROFORMA · {student.name}</span>
+          <span style={{fontSize:13,fontWeight:700,color:"#333"}}>PROFORMA . {student.name}</span>
           <div style={{display:"flex",gap:8}}>
-            <button style={{...T.bp,fontSize:12,padding:"7px 14px"}} onClick={()=>window.print()}>⎙ Imprimir / PDF</button>
-            <button style={{background:"#ddd",border:"none",borderRadius:8,padding:"7px 14px",fontSize:12}} onClick={onClose}>✕ Cerrar</button>
+            <button style={{...T.bp,fontSize:12,padding:"7px 14px"}} onClick={()=>window.print()}>P Imprimir / PDF</button>
+            <button style={{background:"#ddd",border:"none",borderRadius:8,padding:"7px 14px",fontSize:12}} onClick={onClose}>X Cerrar</button>
           </div>
         </div>
         <div style={{padding:36}}>
-          {/* Date range selector */}
-          <div className="no-print" style={{display:"flex",gap:16,marginBottom:20,padding:14,background:"#f4f4f4",borderRadius:8,alignItems:"flex-end"}}>
+                    <div className="no-print" style={{display:"flex",gap:16,marginBottom:20,padding:14,background:"#f4f4f4",borderRadius:8,alignItems:"flex-end"}}>
             <div><div style={{fontSize:10,color:"#999",marginBottom:4}}>FECHA INICIO</div><input type="date" value={startDate} onChange={e=>setStartDate(e.target.value)} style={{background:"#fff",border:"1px solid #ddd",color:"#111",fontSize:13,padding:"6px 10px",borderRadius:6,width:"auto"}}/></div>
             <div><div style={{fontSize:10,color:"#999",marginBottom:4}}>FECHA TÉRMINO</div><input type="date" value={endDate} onChange={e=>setEndDate(e.target.value)} style={{background:"#fff",border:"1px solid #ddd",color:"#111",fontSize:13,padding:"6px 10px",borderRadius:6,width:"auto"}}/></div>
-            <div style={{fontSize:12,color:"#555",paddingBottom:8}}>{sessInRange} sesiones en el período{pricePerSess?` · ${fmtCLP(pricePerSess)}/sesión`:""}</div>
+            <div style={{fontSize:12,color:"#555",paddingBottom:8}}>{sessInRange} sesiones en el período{pricePerSess?` . ${fmtCLP(pricePerSess)}/sesión`:""}</div>
           </div>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:24,paddingBottom:18,borderBottom:"3px solid #111"}}>
             <div>
               <div style={{fontFamily:"var(--fd)",fontSize:34,letterSpacing:3,color:"#111",lineHeight:1}}>{gymInfo.name}</div>
               <div style={{fontSize:12,color:"#666",marginTop:6}}>{gymInfo.address}</div>
-              <div style={{fontSize:12,color:"#666"}}>{gymInfo.phone} · {gymInfo.email}</div>
+              <div style={{fontSize:12,color:"#666"}}>{gymInfo.phone} . {gymInfo.email}</div>
               <div style={{fontSize:12,color:"#666"}}>RUT: {gymInfo.rut}</div>
             </div>
             <div style={{textAlign:"right"}}>
               <div style={{background:"#111",color:"#e8ff3a",padding:"6px 14px",borderRadius:6,fontFamily:"var(--fd)",fontSize:20,letterSpacing:2,marginBottom:6}}>PROFORMA</div>
-              <div style={{fontSize:12,color:"#666"}}>N° {proNum}</div>
+              <div style={{fontSize:12,color:"#666"}}>N {proNum}</div>
               <div style={{fontSize:12,color:"#666"}}>Fecha: {todayISO()}</div>
               <div style={{fontSize:12,color:"#666"}}>Período: {MONTHS[now.getMonth()]} {now.getFullYear()}</div>
             </div>
@@ -118,13 +117,13 @@ export function ProformaModal({student,allUsers,plans,gymInfo,onClose}){
               <div style={{fontSize:10,color:"#999",fontWeight:700,textTransform:"uppercase",letterSpacing:1,marginBottom:8}}>Facturar a</div>
               <div style={{fontSize:16,fontWeight:700,marginBottom:3}}>{student.name}</div>
               <div style={{fontSize:12,color:"#555"}}>ID: {student.uid}</div>
-              <div style={{fontSize:12,color:"#555"}}>Email: {student.email||"—"}</div>
+              <div style={{fontSize:12,color:"#555"}}>Email: {student.email||"-"}</div>
               <div style={{fontSize:12,color:"#555"}}>Entrenador: {trainer?trainer.name:"Sin asignar"}</div>
             </div>
             <div style={{padding:14,background:"#f8f8f8",borderRadius:8,border:"1px solid #eee"}}>
               <div style={{fontSize:10,color:"#999",fontWeight:700,textTransform:"uppercase",letterSpacing:1,marginBottom:8}}>Resumen del mes</div>
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
-                {[["Plan",plan?plan.name:"Sin plan"],["Ses/semana",plan&&plan.sessionsPerWeek?`${plan.sessionsPerWeek}x`:"—"],["Asistencias",`${sessMonth} días`],["Sesiones totales",`${(student.sessions||[]).length}`]].map(([k,v])=>(
+                {[["Plan",plan?plan.name:"Sin plan"],["Ses/semana",plan&&plan.sessionsPerWeek?`${plan.sessionsPerWeek}x`:"-"],["Asistencias",`${sessMonth} días`],["Sesiones totales",`${(student.sessions||[]).length}`]].map(([k,v])=>(
                   <div key={k}><div style={{fontSize:10,color:"#999"}}>{k}</div><div style={{fontSize:13,fontWeight:600}}>{v}</div></div>
                 ))}
               </div>
@@ -140,17 +139,17 @@ export function ProformaModal({student,allUsers,plans,gymInfo,onClose}){
             <tbody><tr style={{borderBottom:"1px solid #eee"}}>
               <td style={{padding:"12px 14px"}}>
                 <div style={{fontWeight:600}}>{plan?plan.name:"Plan no asignado"}</div>
-                <div style={{fontSize:11,color:"#888"}}>Entrenamiento personal · {startDate} al {endDate}</div>
+                <div style={{fontSize:11,color:"#888"}}>Entrenamiento personal . {startDate} al {endDate}</div>
                 {pricePerSess&&<div style={{fontSize:11,color:"#888"}}>{fmtCLP(pricePerSess)} por sesión × {sessInRange} sesiones</div>}
               </td>
-              <td style={{padding:"12px 14px",textAlign:"center"}}>{plan&&plan.sessionsPerWeek?`${plan.sessionsPerWeek}x`:"—"}</td>
+              <td style={{padding:"12px 14px",textAlign:"center"}}>{plan&&plan.sessionsPerWeek?`${plan.sessionsPerWeek}x`:"-"}</td>
               <td style={{padding:"12px 14px",textAlign:"center"}}>{sessInRange}</td>
               <td style={{padding:"12px 14px",textAlign:"right",fontWeight:700}}>{net?fmtCLP(net):"A convenir"}</td>
             </tr></tbody>
           </table>
           <div style={{display:"flex",justifyContent:"flex-end",marginBottom:24}}>
             <div style={{minWidth:240}}>
-              {[["Subtotal neto",net?fmtCLP(net):"—"],["IVA (19%)",iva?fmtCLP(iva):"—"]].map(([k,v])=>(
+              {[["Subtotal neto",net?fmtCLP(net):"-"],["IVA (19%)",iva?fmtCLP(iva):"-"]].map(([k,v])=>(
                 <div key={k} style={{display:"flex",justifyContent:"space-between",padding:"7px 0",borderBottom:"1px solid #eee",fontSize:13}}><span style={{color:"#555"}}>{k}</span><span>{v}</span></div>
               ))}
               <div style={{display:"flex",justifyContent:"space-between",padding:"12px 0",fontSize:18,fontWeight:700,borderBottom:"3px solid #111"}}><span>TOTAL</span><span>{total?fmtCLP(total):"A convenir"}</span></div>
@@ -159,13 +158,13 @@ export function ProformaModal({student,allUsers,plans,gymInfo,onClose}){
           <div style={{padding:16,background:"#f8f8f8",borderRadius:8,border:"1px solid #eee",marginBottom:18}}>
             <div style={{fontSize:10,color:"#999",fontWeight:700,textTransform:"uppercase",letterSpacing:1,marginBottom:10}}>Datos para transferencia bancaria</div>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,fontSize:13}}>
-              {[["Banco",gymInfo.bank],["Tipo cuenta",gymInfo.accountType],["N° cuenta",gymInfo.accountNumber],["Titular",gymInfo.accountHolder],["RUT titular",gymInfo.accountRut],["Email",gymInfo.email]].map(([k,v])=>(
+              {[["Banco",gymInfo.bank],["Tipo cuenta",gymInfo.accountType],["N cuenta",gymInfo.accountNumber],["Titular",gymInfo.accountHolder],["RUT titular",gymInfo.accountRut],["Email",gymInfo.email]].map(([k,v])=>(
                 <div key={k}><div style={{fontSize:10,color:"#aaa",marginBottom:2}}>{k.toUpperCase()}</div><div style={{fontWeight:600}}>{v}</div></div>
               ))}
             </div>
           </div>
           <div style={{fontSize:11,color:"#aaa",textAlign:"center",lineHeight:1.7}}>
-            Documento sin valor tributario · N° {proNum} · {MONTHS[now.getMonth()]} {now.getFullYear()}<br/>
+            Documento sin valor tributario . N {proNum} . {MONTHS[now.getMonth()]} {now.getFullYear()}<br/>
             Al transferir enviar comprobante a {gymInfo.email}
           </div>
         </div>
@@ -180,7 +179,7 @@ export function StudentDash({user,allUsers,plans,onUpdate,isEmbedded=false}){
   const trainer=allUsers.find(u=>u.id===user.trainerId);
   const plan=plans.find(p=>p.id===user.planId);
   const machinesWithData=MACHINES.filter(m=>weightHist(sessions,m.id).length>0);
-  const TABS=[{id:"overview",l:"Resumen",i:"▦"},{id:"sessions",l:"Sesiones",i:"≡"},{id:"load",l:"Carga Muscular",i:"❋"},{id:"progress",l:"Progreso",i:"↗"},{id:"nutrition",l:"Nutrición",i:"❀"},{id:"calendar",l:"Asistencia",i:"▤"}];
+  const TABS=[{id:"overview",l:"Resumen",i:"?"},{id:"sessions",l:"Sesiones",i:"="},{id:"load",l:"Carga Muscular",i:"+"},{id:"progress",l:"Progreso",i:"^"},{id:"nutrition",l:"Nutrición",i:"?"},{id:"calendar",l:"Asistencia",i:"?"}];
   return(
     <div style={{minHeight:isEmbedded?"auto":"100vh",background:"var(--bg)"}}>
       {!isEmbedded&&(
@@ -189,7 +188,7 @@ export function StudentDash({user,allUsers,plans,onUpdate,isEmbedded=false}){
           <div style={{width:1,height:22,background:"var(--br)"}}/>
           <div>
             <div style={{fontSize:14,fontWeight:600}}>{user.name} <span style={{fontFamily:"var(--fm)",fontSize:11,color:"var(--mu)",marginLeft:6}}>{user.uid}</span></div>
-            <div style={{fontSize:11,color:"var(--mu)"}}>Alumno{trainer?` · Coach: ${trainer.name}`:""}{plan?` · ${plan.name}`:""}</div>
+            <div style={{fontSize:11,color:"var(--mu)"}}>Alumno{trainer?` . Coach: ${trainer.name}`:""}{plan?` . ${plan.name}`:""}</div>
           </div>
         </div>
       )}
@@ -204,7 +203,7 @@ export function StudentDash({user,allUsers,plans,onUpdate,isEmbedded=false}){
             {(()=>{
               const planSess=plan&&plan.sessionsPerWeek?plan.sessionsPerWeek*4:null;
               const attPct=planSess?Math.round((tm/planSess)*100):null;
-              return [{l:"Sesiones totales",v:sessions.length,i:"⬆",c:"var(--ac)"},{l:"Días este mes",v:tm,i:"▤",c:"var(--a2)"},{l:"Asistencia mes",v:attPct!=null?`${attPct}%`:`${tm} días`,i:"▦",c:attPct>=80?"var(--gr)":attPct>=50?"var(--or)":"var(--a3)"},{l:"Plan activo",v:plan?plan.name:"—",i:"★",c:"var(--or)"}];
+              return [{l:"Sesiones totales",v:sessions.length,i:"UP",c:"var(--ac)"},{l:"Días este mes",v:tm,i:"?",c:"var(--a2)"},{l:"Asistencia mes",v:attPct!=null?`${attPct}%`:`${tm} días`,i:"?",c:attPct>=80?"var(--gr)":attPct>=50?"var(--or)":"var(--a3)"},{l:"Plan activo",v:plan?plan.name:"-",i:"*",c:"var(--or)"}];
             })().map(x=>(
               <div key={x.l} style={{...T.card,display:"flex",alignItems:"center",gap:12}}>
                 <div style={{fontSize:26}}>{x.i}</div>
@@ -213,7 +212,7 @@ export function StudentDash({user,allUsers,plans,onUpdate,isEmbedded=false}){
             ))}
             <div style={{...T.card,gridColumn:"span 2",border:"1px solid rgba(232,255,58,0.2)"}}>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
-                <div style={{fontSize:11,color:"var(--ac)",fontWeight:700,textTransform:"uppercase",letterSpacing:1}}>★ Próxima sesión sugerida</div>
+                <div style={{fontSize:11,color:"var(--ac)",fontWeight:700,textTransform:"uppercase",letterSpacing:1}}>* Próxima sesión sugerida</div>
                 <button style={{...T.bp,fontSize:12,padding:"6px 14px"}} onClick={()=>{
                   const ns={id:`s_${Date.now()}`,date:todayISO(),exercises:sugg.machines.map((m,i)=>({id:`e_${Date.now()}_${i}`,machineId:m.id,sets:3,reps:10,weight:""}))};
                   const na=(user.attendance||[]).includes(todayISO())?user.attendance:[...(user.attendance||[]),todayISO()];
@@ -232,7 +231,7 @@ export function StudentDash({user,allUsers,plans,onUpdate,isEmbedded=false}){
             </div>
             {sessions.length>0&&(
               <div style={{...T.card,gridColumn:"span 2"}}>
-                <div style={{fontSize:11,color:"var(--mu)",fontWeight:700,marginBottom:10,textTransform:"uppercase",letterSpacing:1}}>Última sesión — {sessions[sessions.length-1].date}</div>
+                <div style={{fontSize:11,color:"var(--mu)",fontWeight:700,marginBottom:10,textTransform:"uppercase",letterSpacing:1}}>Última sesión - {sessions[sessions.length-1].date}</div>
                 <div style={{display:"flex",flexWrap:"wrap",gap:5,marginBottom:10}}>
                   {sessionMuscles(sessions[sessions.length-1]).map(m=><span key={m} style={{...T.tag,background:"rgba(58,255,232,0.1)",color:"var(--a2)"}}>{m}</span>)}
                 </div>
@@ -273,7 +272,7 @@ export function StudentDash({user,allUsers,plans,onUpdate,isEmbedded=false}){
         {tab==="progress"&&(
           <div>
             <div style={{fontFamily:"var(--fd)",fontSize:20,letterSpacing:2,marginBottom:4,color:"var(--mu)"}}>EVOLUCIÓN SEMANAL</div>
-            <div style={{fontSize:13,color:"var(--mu)",marginBottom:16}}>Filas = ejercicios · Columnas = semanas · Color: 🟢 subió · ⚫ igual · 🔴 bajó</div>
+            <div style={{fontSize:13,color:"var(--mu)",marginBottom:16}}>Filas = ejercicios . Columnas = semanas . Color: ? subió . ? igual . ? bajó</div>
             {machinesWithData.length===0&&<div style={{textAlign:"center",padding:60,color:"var(--mu)"}}>Registra sesiones para ver tu progreso.</div>}
             {machinesWithData.length>0&&(()=>{
               // Build weekly buckets
@@ -316,12 +315,12 @@ export function StudentDash({user,allUsers,plans,onUpdate,isEmbedded=false}){
                               const bg=v==null?"transparent":prev==null?"transparent":v>prev?"rgba(58,255,138,0.1)":v<prev?"rgba(255,58,110,0.1)":"transparent";
                               return(
                                 <td key={i} style={{textAlign:"center",background:bg}}>
-                                  {v!=null?<span style={{fontFamily:"var(--fm)",color,fontWeight:600}}>{v}kg</span>:<span style={{color:"var(--br)"}}>—</span>}
+                                  {v!=null?<span style={{fontFamily:"var(--fm)",color,fontWeight:600}}>{v}kg</span>:<span style={{color:"var(--br)"}}>-</span>}
                                 </td>
                               );
                             })}
                             <td style={{textAlign:"center"}}>
-                              <span style={{fontFamily:"var(--fm)",fontSize:13,color:pct>0?"var(--gr)":pct<0?"var(--a3)":"var(--mu)",fontWeight:700}}>{pct>0?"+":""}{first?`${pct}%`:"—"}</span>
+                              <span style={{fontFamily:"var(--fm)",fontSize:13,color:pct>0?"var(--gr)":pct<0?"var(--a3)":"var(--mu)",fontWeight:700}}>{pct>0?"+":""}{first?`${pct}%`:"-"}</span>
                             </td>
                           </tr>
                         );
@@ -338,17 +337,17 @@ export function StudentDash({user,allUsers,plans,onUpdate,isEmbedded=false}){
             <div style={{...T.card,marginBottom:14}}>
               <div style={{fontSize:11,color:"var(--mu)",fontWeight:700,marginBottom:12,textTransform:"uppercase",letterSpacing:1}}>Tu perfil</div>
               <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:10}}>
-                {[["Altura",`${prof.height||"—"} cm`],["Peso",`${prof.weight||"—"} kg`],["Edad",`${prof.age||"—"} años`],["Género",gLbl(prof.gender)],["Objetivo",prof.goal||"—"],["Actividad",prof.activityLevel||"—"]].map(([k,v])=>(
+                {[["Altura",`${prof.height||"-"} cm`],["Peso",`${prof.weight||"-"} kg`],["Edad",`${prof.age||"-"} años`],["Género",gLbl(prof.gender)],["Objetivo",prof.goal||"-"],["Actividad",prof.activityLevel||"-"]].map(([k,v])=>(
                   <div key={k} style={{padding:10,background:"var(--sf2)",borderRadius:8}}><div style={{fontSize:10,color:"var(--mu)",marginBottom:3}}>{k.toUpperCase()}</div><div style={{fontSize:14,fontWeight:600}}>{v}</div></div>
                 ))}
               </div>
-              {prof.restrictions&&<div style={{marginTop:10,padding:10,background:"rgba(255,154,58,0.1)",borderRadius:8,fontSize:13,color:"var(--or)"}}>⚠️ {prof.restrictions}</div>}
+              {prof.restrictions&&<div style={{marginTop:10,padding:10,background:"rgba(255,154,58,0.1)",borderRadius:8,fontSize:13,color:"var(--or)"}}>?? {prof.restrictions}</div>}
             </div>
             {nut?(
               <div style={{...T.card,border:"1px solid rgba(232,255,58,0.2)"}}>
-                <div style={{fontSize:11,color:"var(--ac)",fontWeight:700,marginBottom:12,textTransform:"uppercase",letterSpacing:1}}>❀ Recomendación nutricional diaria</div>
+                <div style={{fontSize:11,color:"var(--ac)",fontWeight:700,marginBottom:12,textTransform:"uppercase",letterSpacing:1}}>? Recomendación nutricional diaria</div>
                 <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:10,marginBottom:14}}>
-                  {[{l:"Calorías",v:nut.calories,u:"kcal",c:"var(--ac)",i:"▲"},{l:"Proteínas",v:nut.protein,u:"g/día",c:"var(--a3)",i:"◆"},{l:"Carbohidratos",v:nut.carbs,u:"g/día",c:"var(--a2)",i:"◇"},{l:"Grasas",v:nut.fat,u:"g/día",c:"var(--or)",i:"●"}].map(n=>(
+                  {[{l:"Calorías",v:nut.calories,u:"kcal",c:"var(--ac)",i:"?"},{l:"Proteínas",v:nut.protein,u:"g/día",c:"var(--a3)",i:"d"},{l:"Carbohidratos",v:nut.carbs,u:"g/día",c:"var(--a2)",i:"c"},{l:"Grasas",v:nut.fat,u:"g/día",c:"var(--or)",i:"f"}].map(n=>(
                     <div key={n.l} style={{padding:14,background:"var(--sf2)",borderRadius:10,textAlign:"center"}}>
                       <div style={{fontSize:22,marginBottom:5}}>{n.i}</div>
                       <div style={{fontFamily:"var(--fd)",fontSize:30,color:n.c,lineHeight:1}}>{n.v}</div>
@@ -357,7 +356,7 @@ export function StudentDash({user,allUsers,plans,onUpdate,isEmbedded=false}){
                     </div>
                   ))}
                 </div>
-                <div style={{fontSize:12,color:"var(--mu)",padding:10,background:"var(--sf2)",borderRadius:8,lineHeight:1.6}}>* Harris-Benedict · actividad <strong style={{color:"var(--tx)"}}>{prof.activityLevel}</strong> · objetivo <strong style={{color:"var(--ac)"}}>{prof.goal}</strong>. Consulta a un nutricionista.</div>
+                <div style={{fontSize:12,color:"var(--mu)",padding:10,background:"var(--sf2)",borderRadius:8,lineHeight:1.6}}>* Harris-Benedict . actividad <strong style={{color:"var(--tx)"}}>{prof.activityLevel}</strong> . objetivo <strong style={{color:"var(--ac)"}}>{prof.goal}</strong>. Consulta a un nutricionista.</div>
               </div>
             ):<div style={{...T.card,textAlign:"center",padding:40,color:"var(--mu)"}}>Completa tu perfil para ver sugerencias nutricionales.</div>}
           </div>
