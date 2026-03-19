@@ -1,6 +1,6 @@
+export * from "./components1a.jsx";
 import { useState } from "react";
 import { db } from "./supabase.js";
-export * from "./components1a.jsx";
 
 export function SessionsTab({user,onUpdateUser,canEdit}){
   const[viewId,setViewId]=useState(null);
@@ -386,3 +386,7 @@ export function StudentDash({user,allUsers,plans,onUpdate,isEmbedded=false}){
     </div>
   );
 }
+
+
+
+
