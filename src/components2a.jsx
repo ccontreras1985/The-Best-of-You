@@ -72,7 +72,7 @@ export function TrainerDash({user,allUsers,plans,onUpdate}){
           </div>
         ):sel&&(
           <div className="fi">
-            <button style={{...T.bg,marginBottom:14}} onClick={()=>setSelId(null)}><- Volver</button>
+            <button style={{...T.bg,marginBottom:14}} onClick={()=>setSelId(null)}>&larr; Volver</button>
             <div style={{...T.card,marginBottom:14,display:"flex",alignItems:"center",gap:12}}>
               <div style={{fontSize:24}}>u</div>
               <div><div style={{fontSize:15,fontWeight:700}}>{sel.name} <span style={{fontFamily:"var(--fm)",fontSize:11,color:"var(--mu)"}}>{sel.uid}</span></div>
