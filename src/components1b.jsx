@@ -1,22 +1,46 @@
 export * from "./components1a.jsx";
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { db } from "./supabase.js";
 
-export function SessionsTab({user,onUpdateUser,canEdit}){
+export function SessionsTab({user,onUpdateUser,canEdit,allUsers=[]}){
   const[viewId,setViewId]=useState(null);
   const[newOpen,setNewOpen]=useState(false);
   const[newDate,setNewDate]=useState(todayISO());
+  const[tplOpen,setTplOpen]=useState(false);
   const sessions=user.sessions||[];
+  const trainer=allUsers.find(u=>u.id===user.trainerId);
+  const templates=(trainer&&trainer.templates)||[];
   function save(sid,exs){onUpdateUser({...user,sessions:sessions.map(s=>s.id===sid?{...s,exercises:exs}:s)});setViewId(null);}
   function del(id){const s=sessions.find(x=>x.id===id);onUpdateUser({...user,sessions:sessions.filter(x=>x.id!==id),attendance:(user.attendance||[]).filter(d=>d!==(s?s.date:""))});}
   function create(){const ns={id:"s_"+(Date.now())+"",date:newDate,exercises:[]};const na=(user.attendance||[]).includes(newDate)?user.attendance:[...(user.attendance||[]),newDate];onUpdateUser({...user,sessions:[...sessions,ns],attendance:na});setNewOpen(false);setViewId(ns.id);}
+  function createFromTemplate(tpl){const today=todayISO();const ns={id:"s_"+(Date.now()),date:today,exercises:tpl.exercises.map((ex,i)=>({...ex,id:"e_"+(Date.now())+"_"+i,weight:""}))};const na=(user.attendance||[]).includes(today)?user.attendance:[...(user.attendance||[]),today];onUpdateUser({...user,sessions:[...sessions,ns],attendance:na});setTplOpen(false);setViewId(ns.id);}
   const viewSess=viewId?sessions.find(s=>s.id===viewId):null;
   return(
     <div>
-      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14,flexWrap:"wrap",gap:8}}>
         <div style={{fontSize:14,fontWeight:600}}>{sessions.length} sesiones registradas</div>
-        {canEdit&&<button style={{...T.bp,fontSize:13}} onClick={()=>setNewOpen(true)}>+ Nueva sesión</button>}
+        <div style={{display:"flex",gap:8}}>
+          {canEdit&&templates.length>0&&<button style={{...T.bg,fontSize:13}} onClick={()=>setTplOpen(p=>!p)}>* Usar plantilla</button>}
+          {canEdit&&<button style={{...T.bp,fontSize:13}} onClick={()=>setNewOpen(true)}>+ Nueva sesión</button>}
+        </div>
       </div>
+      {tplOpen&&templates.length>0&&(
+        <div style={{...T.card,marginBottom:14,border:"1px solid rgba(58,255,232,0.3)"}}>
+          <div style={{fontSize:11,color:"var(--a2)",fontWeight:700,marginBottom:10,textTransform:"uppercase",letterSpacing:1}}>Elegir plantilla del coach</div>
+          <div style={{display:"flex",flexDirection:"column",gap:8}}>
+            {templates.map(t=>(
+              <div key={t.id} style={{padding:12,background:"var(--sf2)",borderRadius:8,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                <div>
+                  <div style={{fontSize:13,fontWeight:600}}>{t.name}</div>
+                  <div style={{fontSize:11,color:"var(--mu)"}}>{t.exercises.length} ejercicios: {t.exercises.slice(0,3).map(ex=>{const m=getMachine(ex.machineId);return m?m.name:ex.machineId;}).join(", ")}{t.exercises.length>3?"...":""}</div>
+                </div>
+                <button style={{...T.bp,fontSize:12,padding:"6px 14px"}} onClick={()=>createFromTemplate(t)}>Usar hoy &rarr;</button>
+              </div>
+            ))}
+          </div>
+          <button style={{...T.bg,fontSize:12,marginTop:8}} onClick={()=>setTplOpen(false)}>Cerrar</button>
+        </div>
+      )}
       {newOpen&&(
         <div className="fi" style={{...T.card,marginBottom:14,border:"1px solid rgba(232,255,58,0.3)"}}>
           <div style={{fontFamily:"var(--fd)",fontSize:18,letterSpacing:2,marginBottom:10}}>NUEVA SESIÓN</div>
@@ -33,12 +57,16 @@ export function SessionsTab({user,onUpdateUser,canEdit}){
         {sessions.length===0&&<div style={{textAlign:"center",padding:60,color:"var(--mu)"}}>Sin sesiones.{canEdit&&<span style={{color:"var(--ac)",cursor:"pointer"}} onClick={()=>setNewOpen(true)}> + Crear primera sesión</span>}</div>}
         {[...sessions].reverse().map(s=>{
           const groups=sessionGroups(s);
+          const stats=calcSessionStats(s);
+          const prs=getSessionPRs(s,sessions);
           return(
-            <div key={s.id} style={{padding:16,background:"var(--sf)",border:"1px solid var(--br)",borderRadius:12,cursor:"pointer"}} onClick={()=>setViewId(s.id)}>
+            <div key={s.id} style={{padding:16,background:"var(--sf)",border:"1px solid "+(prs.size>0?"rgba(232,255,58,0.35)":"var(--br)"),borderRadius:12,cursor:"pointer"}} onClick={()=>setViewId(s.id)}>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
-                <div style={{display:"flex",alignItems:"center",gap:10}}>
+                <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap"}}>
                   <span style={{fontFamily:"var(--fm)",fontSize:13,color:"var(--ac)"}}>{s.date}</span>
                   <span style={{fontSize:12,color:"var(--mu)"}}>{s.exercises.length} ejercicios</span>
+                  {stats.tonnage>0&&<span style={{fontFamily:"var(--fm)",fontSize:11,color:"var(--or)"}}>{stats.tonnage.toLocaleString("es-CL")} kg vol.</span>}
+                  {prs.size>0&&<span style={{...T.tag,background:"rgba(232,255,58,0.15)",color:"var(--ac)",fontSize:10}}>★ {prs.size} PR</span>}
                 </div>
                 <div style={{display:"flex",gap:6,alignItems:"center"}}>
                   {canEdit&&<button style={{...T.bd,fontSize:11,padding:"4px 8px"}} onClick={e=>{e.stopPropagation();del(s.id);}}>X</button>}
@@ -70,15 +98,15 @@ export function ProformaModal({student,allUsers,plans,gymInfo,onClose}){
   const plan=plans.find(p=>p.id===student.planId);
   const trainer=allUsers.find(u=>u.id===student.trainerId);
   const now=new Date();
-  const defaultStart=""+(now.getFullYear())+"-${String(now.getMonth()+1).padStart(2,"0")}-01";
+  const defaultStart=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-01";
   const lastDay=new Date(now.getFullYear(),now.getMonth()+1,0).getDate();
-  const defaultEnd=""+(now.getFullYear())+"-${String(now.getMonth()+1).padStart(2,"0")}-${String(lastDay).padStart(2,"0")}";
+  const defaultEnd=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(lastDay).padStart(2,"0");
   const[startDate,setStartDate]=useState(defaultStart);
   const[endDate,setEndDate]=useState(defaultEnd);
   const sessInRange=(student.attendance||[]).filter(d=>d>=startDate&&d<=endDate).length;
   const pricePerSess=plan&&plan.priceNet&&plan.sessionsPerWeek?Math.round(plan.priceNet/(plan.sessionsPerWeek*4)):null;
   const netCalc=pricePerSess?pricePerSess*sessInRange:plan&&plan.priceNet?+plan.priceNet:null;
-  const proNum="ET-"+(now.getFullYear())+"${String(now.getMonth()+1).padStart(2,"0")}-${student.uid||"000"}";
+  const proNum="ET-"+now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+(student.uid||"000");
   const net=netCalc;
   const iva=net?Math.round(net*0.19):null;
   const total=net?net+iva:null;
@@ -179,7 +207,7 @@ export function StudentDash({user,allUsers,plans,onUpdate,isEmbedded=false}){
   const trainer=allUsers.find(u=>u.id===user.trainerId);
   const plan=plans.find(p=>p.id===user.planId);
   const machinesWithData=MACHINES.filter(m=>weightHist(sessions,m.id).length>0);
-  const TABS=[{id:"overview",l:"Resumen",i:"?"},{id:"sessions",l:"Sesiones",i:"="},{id:"load",l:"Carga Muscular",i:"+"},{id:"progress",l:"Progreso",i:"^"},{id:"nutrition",l:"Nutrición",i:"?"},{id:"calendar",l:"Asistencia",i:"?"}];
+  const TABS=[{id:"overview",l:"Resumen",i:"?"},{id:"sessions",l:"Sesiones",i:"="},{id:"load",l:"Carga Muscular",i:"+"},{id:"progress",l:"Progreso",i:"^"},{id:"nutrition",l:"Nutrición",i:"?"},{id:"calendar",l:"Asistencia",i:"?"},{id:"qr",l:"Mi QR",i:"[QR]"}];
   return(
     <div style={{minHeight:isEmbedded?"auto":"100vh",background:"var(--bg)"}}>
       {!isEmbedded&&(
@@ -246,7 +274,7 @@ export function StudentDash({user,allUsers,plans,onUpdate,isEmbedded=false}){
             )}
           </div>
         )}
-        {tab==="sessions"&&<SessionsTab user={user} onUpdateUser={onUpdate} canEdit={true}/>}
+        {tab==="sessions"&&<SessionsTab user={user} onUpdateUser={onUpdate} canEdit={true} allUsers={allUsers}/>}
         {tab==="load"&&(
           <div>
             <div style={{marginBottom:18}}>
@@ -364,7 +392,7 @@ export function StudentDash({user,allUsers,plans,onUpdate,isEmbedded=false}){
         {tab==="calendar"&&(
           <div style={{display:"grid",gridTemplateColumns:"auto 1fr",gap:16,maxWidth:800}}>
             <div style={{...T.card,minWidth:240}}>
-              <AttCal attendance={att}/>
+              <AttCal attendance={att} sessions={sessions}/>
               <div style={{marginTop:12,borderTop:"1px solid var(--br)",paddingTop:12}}>
                 {[["Este mes",tm,"var(--ac)"],["Total acumulado",att.length,"var(--a2)"]].map(([l,v,c])=>(
                   <div key={l} style={{display:"flex",justifyContent:"space-between",marginBottom:5}}><span style={{fontSize:13,color:"var(--mu)"}}>{l}</span><span style={{fontFamily:"var(--fm)",color:c}}>{v} días</span></div>
@@ -382,11 +410,25 @@ export function StudentDash({user,allUsers,plans,onUpdate,isEmbedded=false}){
             </div>
           </div>
         )}
+        {tab==="qr"&&(
+          <div style={{maxWidth:420}}>
+            <div style={{fontFamily:"var(--fd)",fontSize:20,letterSpacing:2,marginBottom:16}}>MI QR DE ACCESO</div>
+            <QRCard userId={user.uid} userName={user.name}/>
+            <div style={{...T.card,marginTop:14,fontSize:13,color:"var(--mu)",lineHeight:1.8}}>
+              <div style={{fontWeight:700,color:"var(--tx)",marginBottom:6}}>¿Cómo funciona?</div>
+              <ol style={{paddingLeft:18,display:"flex",flexDirection:"column",gap:6}}>
+                <li>Al llegar al gym, escanea este QR con la cámara de tu teléfono.</li>
+                <li>Se abrirá una pantalla de confirmación en el navegador.</li>
+                <li>Tu asistencia quedará registrada automáticamente.</li>
+                <li>El QR puede imprimirse o mostrarse desde la app.</li>
+              </ol>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 }
-
 
 
 

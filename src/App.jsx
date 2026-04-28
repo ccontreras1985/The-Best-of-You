@@ -4,7 +4,8 @@ import { GS, T, MACHINES, MACHINE_GROUPS, GROUP_ICONS, GC, MONTHS, DEFAULT_PLANS
   newUid, newId, getMachine, sessionMuscles, sessionGroups, suggestNext, calcNut, weightHist,
   monthCount, todayISO, fmtCLP, gLbl,
   MachineSelect, MiniLine, MuscleRadar, AttCal, ProfileSetup, SessionModal, SessionsTab,
-  ProformaModal, StudentDash, TrainerDash, FinanceDash, AdminDash, Login
+  ProformaModal, StudentDash, TrainerDash, FinanceDash, AdminDash, Login,
+  CheckinScreen, QRCard
 } from "./components2b_login.jsx";
 
 export default function App(){
@@ -12,6 +13,7 @@ export default function App(){
   const[plans,setPlans]=useState(DEFAULT_PLANS);
   const[loading,setLoading]=useState(true);
   const[currentUser,setCurrentUser]=useState(null);
+  const isCheckin=new URLSearchParams(window.location.search).has("checkin");
   // Load data from Supabase on startup
   useEffect(()=>{
     async function load(){
@@ -72,6 +74,7 @@ export default function App(){
       </div>
     </>
   );
+  if(isCheckin) return(<><GS/><CheckinScreen users={users} onCheckinDone={()=>{window.history.replaceState({},"",window.location.pathname);window.location.reload();}}/></>);
   if(!synced) return(<><GS/><Login users={users} onLogin={u=>setCurrentUser(u)} onUpdateUsers={updateUser}/></>);
   return(
     <>

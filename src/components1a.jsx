@@ -50,7 +50,7 @@ export const MACHINES = [
   {id:"seated_row",name:"Remo Sentado",muscles:["Dorsal","Trapecio","Bíceps"],emoji:"~",color:"#3affe8",group:"Espalda"},
   {id:"hip_thrust_machine",name:"Hip Thrust (máquina)",muscles:["Glúteos","Isquiotibiales"],emoji:"o",color:"#ff3aaa",group:"Piernas"},
   {id:"incline_press",name:"Press Inclinado",muscles:["Pecho superior","Hombros","Tríceps"],emoji:"+",color:"#ff9a3a",group:"Pecho"},
-  {id:"dips",name:"Fondos / Dips",muscles:["Tríceps","Pecho","Hombros"],emoji:"\",color:"#ff3a6e",group:"Pecho"},
+  {id:"dips",name:"Fondos / Dips",muscles:["Tríceps","Pecho","Hombros"],emoji:"V",color:"#ff3a6e",group:"Pecho"},
   {id:"pull_up_bar",name:"Barra de Dominadas",muscles:["Dorsal","Bíceps","Core"],emoji:"^",color:"#3affe8",group:"Espalda"},
   {id:"barbell_deadlift",name:"Peso Muerto Barra",muscles:["Isquiotibiales","Glúteos","Espalda baja"],emoji:"UP",color:"#e8ff3a",group:"Piernas"},
 ];
@@ -115,7 +115,7 @@ export function suggestNext(sessions){
   const last=sessionGroups(sessions[sessions.length-1]);
   const all=[...new Set(MACHINES.map(m=>m.group))];
   const next=all.filter(g=>!last.includes(g)).slice(0,2);
-  return{machines:MACHINES.filter(m=>next.includes(m.group)).slice(0,4),reason:"Última: "+(last.join(", "))+" . Siguiente: ${next.join(", ")}"};
+  return{machines:MACHINES.filter(m=>next.includes(m.group)).slice(0,4),reason:"Última: "+last.join(", ")+" . Siguiente: "+next.join(", ")};
 }
 export function calcNut(p){
   if(!p||!p.height||!p.weight||!p.age) return null;
@@ -132,8 +132,22 @@ export function weightHist(sessions,mid){
     .map(s=>{const ex=s.exercises.find(e=>e.machineId===mid);return{date:s.date,weight:ex.weight,sets:ex.sets,reps:ex.reps};})
     .sort((a,b)=>a.date.localeCompare(b.date));
 }
+export function calcSessionStats(session){
+  let sets=0,reps=0,tonnage=0;
+  (session.exercises||[]).forEach(ex=>{const s=+ex.sets||0,r=+ex.reps||0,w=+ex.weight||0;sets+=s;reps+=s*r;tonnage+=s*r*w;});
+  return{sets,reps,tonnage};
+}
+export function getSessionPRs(session,allSessions){
+  const prs=new Set();
+  (session.exercises||[]).forEach(ex=>{
+    if(!ex.weight||+ex.weight<=0)return;
+    const prevMax=allSessions.filter(s=>s.id!==session.id).flatMap(s=>s.exercises).filter(e=>e.machineId===ex.machineId&&+e.weight>0).reduce((mx,e)=>Math.max(mx,+e.weight),0);
+    if(+ex.weight>prevMax)prs.add(ex.machineId);
+  });
+  return prs;
+}
 export function monthCount(att){
-  const n=new Date(),ym=""+(n.getFullYear())+"-${String(n.getMonth()+1).padStart(2,"0")}";
+  const n=new Date(),ym=n.getFullYear()+"-"+String(n.getMonth()+1).padStart(2,"0");
   return(att||[]).filter(d=>d.startsWith(ym)).length;
 }
 export function todayISO(){return new Date().toISOString().slice(0,10);}
@@ -202,26 +216,33 @@ export function MuscleRadar({sessions}){
     </div>
   );
 }
-export function AttCal({attendance}){
+export function AttCal({attendance,sessions=[]}){
   const now=new Date(),y=now.getFullYear(),mo=now.getMonth();
   const dim=new Date(y,mo+1,0).getDate(),fd=new Date(y,mo,1).getDay(),attSet=new Set(attendance);
+  const sessSet=new Set((sessions||[]).map(s=>s.date));
   const cells=[];
   for(let i=0;i<fd;i++)cells.push(null);
-  for(let d=1;d<=dim;d++){const ds=""+(y)+"-${String(mo+1).padStart(2,"0")}-${String(d).padStart(2,"0")}";cells.push({day:d,att:attSet.has(ds),today:d===now.getDate()});}
+  for(let d=1;d<=dim;d++){const ds=y+"-"+String(mo+1).padStart(2,"0")+"-"+String(d).padStart(2,"0");cells.push({day:d,att:attSet.has(ds),hasSess:sessSet.has(ds),today:d===now.getDate()});}
   return(
     <div>
       <div style={{fontSize:12,fontWeight:600,color:"var(--mu)",marginBottom:8,textTransform:"uppercase",letterSpacing:1}}>{MONTHS[mo]} {y}</div>
       <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:3}}>
         {["D","L","M","X","J","V","S"].map(d=><div key={d} style={{fontSize:9,color:"var(--mu)",textAlign:"center",paddingBottom:3}}>{d}</div>)}
         {cells.map((c,i)=>(
-          <div key={i} style={{aspectRatio:"1",borderRadius:5,display:"flex",alignItems:"center",justifyContent:"center",
+          <div key={i} style={{aspectRatio:"1",borderRadius:5,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",position:"relative",
             background:!c?"transparent":c.att?"var(--ac)":"var(--sf2)",
             border:!c?"none":c.today?"1px solid var(--ac)":"1px solid var(--br)",
             fontSize:10,fontWeight:c&&c.att?700:400,
             color:!c?"transparent":c.att?"#000":c.today?"var(--ac)":"var(--mu)"}}>
             {c?c.day:""}
+            {c&&c.hasSess&&!c.att&&<div style={{width:4,height:4,borderRadius:"50%",background:"var(--a2)",position:"absolute",bottom:2}}/>}
+            {c&&c.hasSess&&c.att&&<div style={{width:4,height:4,borderRadius:"50%",background:"#0a0a0b",position:"absolute",bottom:2}}/>}
           </div>
         ))}
+      </div>
+      <div style={{display:"flex",gap:14,marginTop:10,fontSize:10,color:"var(--mu)"}}>
+        <span style={{display:"flex",alignItems:"center",gap:4}}><span style={{width:10,height:10,background:"var(--ac)",borderRadius:2,display:"inline-block"}}/>Asistencia</span>
+        <span style={{display:"flex",alignItems:"center",gap:4}}><span style={{width:6,height:6,background:"var(--a2)",borderRadius:"50%",display:"inline-block"}}/>Con sesión registrada</span>
       </div>
     </div>
   );
@@ -341,6 +362,50 @@ export function SessionModal({session,onClose,onSave,canEdit}){
         )}
         {canEdit&&<button style={{...T.bp,width:"100%",marginTop:14,padding:12}} onClick={()=>onSave(exs)}>Guardar cambios &rarr;</button>}
       </div>
+    </div>
+  );
+}
+export function QRCard({userId,userName,gymName="Elite Trainer"}){
+  const url=`${window.location.origin}/?checkin=${userId}`;
+  const qrSrc=`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(url)}&margin=8`;
+  return(
+    <div style={{...T.card,textAlign:"center",border:"1px solid rgba(232,255,58,0.3)",maxWidth:260,margin:"0 auto"}}>
+      <div style={{fontSize:10,color:"var(--ac)",fontWeight:700,textTransform:"uppercase",letterSpacing:1.5,marginBottom:12}}>QR ACCESO AL GYM</div>
+      <img src={qrSrc} alt="QR" style={{width:180,height:180,borderRadius:8,border:"2px solid var(--br)"}}/>
+      <div style={{marginTop:10,fontWeight:700,fontSize:14}}>{userName}</div>
+      <div style={{fontFamily:"var(--fm)",fontSize:11,color:"var(--ac)",marginTop:2}}>{userId}</div>
+      <div style={{fontSize:11,color:"var(--mu)",marginTop:6,lineHeight:1.5}}>Presenta este QR en la entrada<br/>para registrar tu asistencia</div>
+    </div>
+  );
+}
+export function CheckinScreen({users,onCheckinDone}){
+  const params=new URLSearchParams(window.location.search);
+  const uid=params.get("checkin");
+  const[status,setStatus]=useState("loading");
+  const[userName,setUserName]=useState("");
+  useEffect(()=>{
+    if(!uid){setStatus("invalid");return;}
+    const user=users.find(u=>u.uid===uid||u.id===uid);
+    if(!user){setStatus("notfound");return;}
+    setUserName(user.name);
+    const today=todayISO();
+    if((user.attendance||[]).includes(today)){setStatus("already");return;}
+    const dbUser={id:user.id,uid:user.uid,role:user.role,name:user.name,username:user.username,password:user.password,email:user.email,active:user.active!==false,trainer_id:user.trainerId||null,plan_id:user.planId||null,profile:user.profile||{},attendance:[...(user.attendance||[]),today],sessions:user.sessions||[],assigned_students:user.assignedStudents||[]};
+    db.upsertUser(dbUser).then(()=>setStatus("ok")).catch(()=>setStatus("error"));
+  },[uid]);
+  const ico={ok:"✓",already:"★",loading:"…",notfound:"✗",invalid:"✗",error:"✗"}[status]||"?";
+  const col=status==="ok"||status==="already"?"var(--gr)":status==="loading"?"var(--mu)":"var(--a3)";
+  const msgs={ok:`¡Bienvenido, ${userName}! Asistencia registrada para hoy.`,already:`Hola ${userName}, tu asistencia de hoy ya fue registrada.`,notfound:"Usuario no encontrado. Solicita un nuevo QR a tu coach.",invalid:"QR inválido.",error:"Error al registrar. Intenta de nuevo.",loading:"Verificando..."};
+  return(
+    <div style={{minHeight:"100vh",background:"var(--bg)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:24,gap:20}}>
+      <div style={{fontFamily:"var(--fd)",fontSize:34,letterSpacing:3,color:"var(--ac)"}}>ELITE TRAINER</div>
+      <div style={{...T.card,textAlign:"center",maxWidth:340,width:"100%",padding:36}}>
+        <div style={{fontSize:64,marginBottom:16,color:col}}>{ico}</div>
+        <div style={{fontSize:16,fontWeight:700,marginBottom:8,color:col}}>{status==="ok"?"ACCESO REGISTRADO":status==="already"?"YA REGISTRADO":status==="loading"?"VERIFICANDO...":"ERROR"}</div>
+        <div style={{fontSize:14,color:"var(--mu)",lineHeight:1.6}}>{msgs[status]}</div>
+        {status!=="loading"&&<button style={{...T.bg,marginTop:20,width:"100%"}} onClick={onCheckinDone}>Ir al inicio</button>}
+      </div>
+      <div style={{fontSize:11,color:"var(--mu)"}}>{todayISO()}</div>
     </div>
   );
 }

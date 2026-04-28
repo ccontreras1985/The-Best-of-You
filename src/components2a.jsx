@@ -5,6 +5,7 @@ import { db } from "./supabase.js";
 
 export function TrainerDash({user,allUsers,plans,onUpdate}){
   const[selId,setSelId]=useState(null);
+  const[view,setView]=useState("students");
   const students=allUsers.filter(u=>(user.assignedStudents||[]).includes(u.id)&&u.active!==false);
   const today=todayISO(),todaySt=students.filter(s=>(s.attendance||[]).includes(today));
   const sel=selId?allUsers.find(u=>u.id===selId):null;
@@ -18,8 +19,23 @@ export function TrainerDash({user,allUsers,plans,onUpdate}){
           <div style={{fontSize:11,color:"var(--mu)"}}>Entrenador Personal . {students.length} alumnos</div>
         </div>
       </div>
+      <div style={{borderBottom:"1px solid var(--br)",padding:"0 24px",display:"flex",gap:0,background:"var(--sf)"}}>
+        {[["students","Mis Alumnos"],["library","Biblioteca de Rutinas"],["qrlist","QR Alumnos"]].map(([id,l])=>(
+          <button key={id} onClick={()=>{setSelId(null);setView(id);}} style={{background:"none",border:"none",padding:"12px 16px",fontSize:13,fontWeight:500,cursor:"pointer",color:view===id?"var(--ac)":"var(--mu)",borderBottom:"2px solid "+(view===id?"var(--ac)":"transparent"),transition:"color .2s"}}>{l}</button>
+        ))}
+      </div>
       <div style={{padding:24,maxWidth:1080,margin:"0 auto"}}>
-        {!sel?(
+        {view==="qrlist"&&!sel&&(
+          <div className="fi">
+            <div style={{fontFamily:"var(--fd)",fontSize:18,letterSpacing:2,color:"var(--mu)",marginBottom:16}}>QR DE ACCESO — ALUMNOS</div>
+            <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(240px,1fr))",gap:16}}>
+              {students.map(s=><QRCard key={s.id} userId={s.uid} userName={s.name}/>)}
+              {students.length===0&&<div style={{color:"var(--mu)",fontSize:13}}>No tienes alumnos asignados.</div>}
+            </div>
+          </div>
+        )}
+        {view==="library"&&!sel&&<ProgramLibrary trainer={user} onUpdate={onUpdate}/>}
+        {view==="students"&&!sel?(
           <div className="fi">
             <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:14,marginBottom:20}}>
               {[{l:"Alumnos asignados",v:students.length,c:"var(--ac)",i:"i"},{l:"Atendidos hoy",v:todaySt.length,c:"var(--a2)",i:"OK"},{l:"Sin asistir hoy",v:students.length-todaySt.length,c:"var(--a3)",i:"?"}].map(x=>(
@@ -67,7 +83,8 @@ export function TrainerDash({user,allUsers,plans,onUpdate}){
               })}
             </div>
           </div>
-        ):sel&&(
+        ):null}
+        {sel&&(
           <div className="fi">
             <button style={{...T.bg,marginBottom:14}} onClick={()=>setSelId(null)}>&larr; Volver</button>
             <div style={{...T.card,marginBottom:14,display:"flex",alignItems:"center",gap:12}}>
@@ -83,9 +100,77 @@ export function TrainerDash({user,allUsers,plans,onUpdate}){
     </div>
   );
 }
+function ProgramLibrary({trainer,onUpdate}){
+  const templates=trainer.templates||[];
+  const[newTpl,setNewTpl]=useState(null);
+  const[tplName,setTplName]=useState("");
+  const[tplExs,setTplExs]=useState([]);
+  function startNew(){setTplName("");setTplExs([{id:"te_1",machineId:MACHINES[0].id,sets:3,reps:10}]);setNewTpl(true);}
+  function addEx(){setTplExs(p=>[...p,{id:"te_"+(Date.now()),machineId:MACHINES[0].id,sets:3,reps:10}]);}
+  function saveTpl(){
+    if(!tplName.trim())return;
+    const tpl={id:"tpl_"+(Date.now()),name:tplName.trim(),exercises:tplExs};
+    onUpdate({...trainer,templates:[...templates,tpl]});
+    setNewTpl(null);
+  }
+  function delTpl(id){onUpdate({...trainer,templates:templates.filter(t=>t.id!==id)});}
+  return(
+    <div className="fi">
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
+        <div><div style={{fontFamily:"var(--fd)",fontSize:18,letterSpacing:2}}>BIBLIOTECA DE RUTINAS</div>
+          <div style={{fontSize:12,color:"var(--mu)"}}>Plantillas que tus alumnos pueden usar para crear sesiones</div>
+        </div>
+        <button style={T.bp} onClick={startNew}>+ Nueva plantilla</button>
+      </div>
+      {newTpl&&(
+        <div style={{...T.card,marginBottom:16,border:"1px solid rgba(232,255,58,0.3)"}}>
+          <div style={{marginBottom:10}}><label style={{fontSize:11,color:"var(--mu)",display:"block",marginBottom:5}}>NOMBRE DE LA RUTINA</label>
+            <input value={tplName} onChange={e=>setTplName(e.target.value)} placeholder="Ej: Piernas + Glúteos A"/>
+          </div>
+          <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:12}}>
+            {tplExs.map((ex,i)=>(
+              <div key={ex.id} style={{display:"grid",gridTemplateColumns:"1fr 80px 80px 32px",gap:8,alignItems:"center"}}>
+                <MachineSelect value={ex.machineId} onChange={v=>setTplExs(p=>p.map((e,j)=>j===i?{...e,machineId:v}:e))}/>
+                <input type="number" value={ex.sets} onChange={e=>setTplExs(p=>p.map((e2,j)=>j===i?{...e2,sets:+e.target.value}:e2))} placeholder="Series" style={{padding:"6px 8px",fontSize:12}}/>
+                <input type="number" value={ex.reps} onChange={e=>setTplExs(p=>p.map((e2,j)=>j===i?{...e2,reps:+e.target.value}:e2))} placeholder="Reps" style={{padding:"6px 8px",fontSize:12}}/>
+                <button style={{...T.bd,padding:"4px 8px"}} onClick={()=>setTplExs(p=>p.filter((_,j)=>j!==i))}>X</button>
+              </div>
+            ))}
+          </div>
+          <div style={{display:"flex",gap:8}}>
+            <button style={T.bp} onClick={addEx}>+ Ejercicio</button>
+            <button style={{...T.bp,background:"var(--gr)"}} onClick={saveTpl}>Guardar plantilla</button>
+            <button style={T.bg} onClick={()=>setNewTpl(null)}>Cancelar</button>
+          </div>
+        </div>
+      )}
+      {templates.length===0&&!newTpl&&<div style={{color:"var(--mu)",textAlign:"center",padding:40}}>No hay plantillas. Crea la primera.</div>}
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(280px,1fr))",gap:12}}>
+        {templates.map(t=>(
+          <div key={t.id} style={T.card}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+              <div style={{fontSize:15,fontWeight:700}}>{t.name}</div>
+              <button style={{...T.bd,fontSize:11,padding:"3px 8px"}} onClick={()=>delTpl(t.id)}>X</button>
+            </div>
+            <div style={{display:"flex",flexDirection:"column",gap:5}}>
+              {(t.exercises||[]).map((ex,i)=>{const m=getMachine(ex.machineId);return(
+                <div key={i} style={{display:"flex",gap:8,alignItems:"center",fontSize:12}}>
+                  <span>{m?m.emoji:"?"}</span>
+                  <span style={{flex:1,color:"var(--tx)"}}>{m?m.name:ex.machineId}</span>
+                  <span style={{fontFamily:"var(--fm)",color:"var(--ac)"}}>{ex.sets}×{ex.reps}</span>
+                </div>
+              );})}
+            </div>
+            <div style={{fontSize:11,color:"var(--mu)",marginTop:10}}>{t.exercises.length} ejercicios . Los alumnos pueden aplicarla como sesión base</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 export function FinanceDash({users,students,trainers,plans,onUpdate,setProformaStudent}){
   const now2=new Date();
-  const ym=""+(now2.getFullYear())+"-${String(now2.getMonth()+1).padStart(2,"0")}";
+  const ym=now2.getFullYear()+"-"+String(now2.getMonth()+1).padStart(2,"0");
   const rows=students.map(s=>{
     const plan=plans.find(p=>p.id===s.planId);
     const sessM=(s.attendance||[]).filter(d=>d.startsWith(ym)).length;
