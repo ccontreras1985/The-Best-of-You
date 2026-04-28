@@ -31,7 +31,10 @@ export default function App(){
         }));
         setUsers(mapped);
         if(ps && ps.length) setPlans(ps.map(p=>({...p, sessionsPerWeek:p.sessions_per_week, priceNet:p.price_net})));
-      }catch(e){ console.error("Error loading data:", e); }
+      }catch(e){
+        console.warn("Supabase no disponible, usando datos demo:", e.message);
+        setUsers(INIT_USERS);
+      }
       setLoading(false);
     }
     load();
