@@ -1,6 +1,8 @@
 export * from "./components1b.jsx";
 import { useState } from "react";
 import { db } from "./supabase.js";
+import { T, MONTHS, fmtCLP, todayISO, suggestNext, monthCount, sessionGroups, getMachine, MACHINES, GC, MachineSelect, QRCard } from "./components1b.jsx";
+import { StudentDash } from "./components1b.jsx";
 
 
 export function TrainerDash({user,allUsers,plans,onUpdate}){

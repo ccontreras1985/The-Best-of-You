@@ -1,6 +1,7 @@
 export * from "./components1a.jsx";
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import { db } from "./supabase.js";
+import { T, MACHINES, getMachine, sessionGroups, sessionMuscles, calcNut, weightHist, monthCount, todayISO, GC, fmtCLP, MONTHS, suggestNext, AttCal, MuscleRadar, MiniLine, SessionModal, MachineSelect, calcSessionStats, getSessionPRs, QRCard } from "./components1a.jsx";
 
 export function SessionsTab({user,onUpdateUser,canEdit,allUsers=[]}){
   const[viewId,setViewId]=useState(null);

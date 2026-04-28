@@ -1,6 +1,7 @@
 export * from "./components2a.jsx";
 import { useState } from "react";
 import { db } from "./supabase.js";
+import { T, DEFAULT_PLANS, DEFAULT_GYM, todayISO, fmtCLP, newUid, newId, monthCount, MONTHS, StudentDash, TrainerDash, FinanceDash, ProformaModal, ProfileSetup } from "./components2a.jsx";
 
 export function AdminDash({users,onUpdate}){
   const[tab,setTab]=useState("users");
