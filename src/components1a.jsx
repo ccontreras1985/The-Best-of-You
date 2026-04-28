@@ -157,7 +157,7 @@ export function MachineSelect({value, onChange}) {
   return (
     <select value={value} onChange={e=>onChange(e.target.value)}>
       {Object.entries(MACHINE_GROUPS).map(([grp, ids])=>(
-        <optgroup key={grp} label={""+(GROUP_ICONS[grp]||"")+" ${grp}"}>
+        <optgroup key={grp} label={(GROUP_ICONS[grp]||"")+" "+grp}>
           {ids.map(id=>{const m=MACHINES.find(x=>x.id===id);return m?<option key={id} value={id}>{m.emoji} {m.name}</option>:null;})}
         </optgroup>
       ))}

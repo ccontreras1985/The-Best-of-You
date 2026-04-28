@@ -242,7 +242,7 @@ export function StudentDash({user,allUsers,plans,onUpdate,isEmbedded=false}){
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
                 <div style={{fontSize:11,color:"var(--ac)",fontWeight:700,textTransform:"uppercase",letterSpacing:1}}>* Próxima sesión sugerida</div>
                 <button style={{...T.bp,fontSize:12,padding:"6px 14px"}} onClick={()=>{
-                  const ns={id:"s_"+(Date.now())+"",date:todayISO(),exercises:sugg.machines.map((m,i)=>({id:"e_"+(Date.now())+"_${i}",machineId:m.id,sets:3,reps:10,weight:""}))};
+                  const ns={id:"s_"+(Date.now()),date:todayISO(),exercises:sugg.machines.map((m,i)=>({id:"e_"+(Date.now())+"_"+i,machineId:m.id,sets:3,reps:10,weight:""}))};
                   const na=(user.attendance||[]).includes(todayISO())?user.attendance:[...(user.attendance||[]),todayISO()];
                   onUpdate({...user,sessions:[...(user.sessions||[]),ns],attendance:na});
                 }}>+ Crear esta sesión</button>
