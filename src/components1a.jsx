@@ -129,20 +129,22 @@ export function calcNut(p){
 }
 export function weightHist(sessions,mid){
   return sessions.filter(s=>s.exercises.some(e=>e.machineId===mid))
-    .map(s=>{const ex=s.exercises.find(e=>e.machineId===mid);return{date:s.date,weight:ex.weight,sets:ex.sets,reps:ex.reps};})
+    .map(s=>{const ex=s.exercises.find(e=>e.machineId===mid);const sd=getSD(ex);const maxW=Math.max(...sd.map(s=>+s.weight||0),0);const totalR=sd.reduce((a,s)=>a+(+s.reps||0),0);return{date:s.date,weight:maxW,sets:sd.length,reps:totalR};})
     .sort((a,b)=>a.date.localeCompare(b.date));
 }
+function getSD(ex){if(ex.setData&&ex.setData.length)return ex.setData;const n=Math.max(+ex.sets||1,1);return Array.from({length:n},()=>({reps:ex.reps||"",weight:ex.weight||""}));}
 export function calcSessionStats(session){
   let sets=0,reps=0,tonnage=0;
-  (session.exercises||[]).forEach(ex=>{const s=+ex.sets||0,r=+ex.reps||0,w=+ex.weight||0;sets+=s;reps+=s*r;tonnage+=s*r*w;});
+  (session.exercises||[]).forEach(ex=>{const sd=getSD(ex);sets+=sd.length;sd.forEach(s=>{reps+=+s.reps||0;tonnage+=(+s.reps||0)*(+s.weight||0);});});
   return{sets,reps,tonnage};
 }
 export function getSessionPRs(session,allSessions){
   const prs=new Set();
   (session.exercises||[]).forEach(ex=>{
-    if(!ex.weight||+ex.weight<=0)return;
-    const prevMax=allSessions.filter(s=>s.id!==session.id).flatMap(s=>s.exercises).filter(e=>e.machineId===ex.machineId&&+e.weight>0).reduce((mx,e)=>Math.max(mx,+e.weight),0);
-    if(+ex.weight>prevMax)prs.add(ex.machineId);
+    const sd=getSD(ex),maxW=Math.max(...sd.map(s=>+s.weight||0),0);
+    if(maxW<=0)return;
+    const prevMax=allSessions.filter(s=>s.id!==session.id).flatMap(s=>s.exercises).filter(e=>e.machineId===ex.machineId).reduce((mx,e)=>Math.max(mx,...getSD(e).map(s=>+s.weight||0),0),0);
+    if(maxW>prevMax)prs.add(ex.machineId);
   });
   return prs;
 }
@@ -217,32 +219,50 @@ export function MuscleRadar({sessions}){
   );
 }
 export function AttCal({attendance,sessions=[]}){
-  const now=new Date(),y=now.getFullYear(),mo=now.getMonth();
-  const dim=new Date(y,mo+1,0).getDate(),fd=new Date(y,mo,1).getDay(),attSet=new Set(attendance);
-  const sessSet=new Set((sessions||[]).map(s=>s.date));
+  const now=new Date(),y=now.getFullYear(),mo=now.getMonth(),today=todayISO();
+  const dim=new Date(y,mo+1,0).getDate(),fd=new Date(y,mo,1).getDay(),attSet=new Set(attendance||[]);
+  // compute session status per date
+  const sessMap={};
+  (sessions||[]).forEach(sess=>{
+    const d=sess.date;if(!d)return;
+    const inAtt=attSet.has(d),isFut=d>today;
+    let st;
+    if(isFut){st="future";}
+    else if(!inAtt){st="missed";}
+    else{
+      const exs=sess.exercises||[];
+      if(!exs.length){st="incomplete";}
+      else{
+        const allDone=exs.every(ex=>{const sd=getSD(ex);return sd.some(s=>+s.reps>0);});
+        st=allDone?"complete":"incomplete";
+      }
+    }
+    if(!sessMap[d]||st==="complete")sessMap[d]=st;
+  });
+  const SC={complete:{bg:"var(--gr)",tx:"#000",br:"var(--gr)"},incomplete:{bg:"rgba(232,200,0,0.25)",tx:"#d4b800",br:"#d4b800"},missed:{bg:"rgba(255,58,110,0.18)",tx:"var(--a3)",br:"var(--a3)"},future:{bg:"rgba(58,138,255,0.15)",tx:"#3a8aff",br:"#3a8aff"}};
   const cells=[];
   for(let i=0;i<fd;i++)cells.push(null);
-  for(let d=1;d<=dim;d++){const ds=y+"-"+String(mo+1).padStart(2,"0")+"-"+String(d).padStart(2,"0");cells.push({day:d,att:attSet.has(ds),hasSess:sessSet.has(ds),today:d===now.getDate()});}
+  for(let d=1;d<=dim;d++){
+    const ds=y+"-"+String(mo+1).padStart(2,"0")+"-"+String(d).padStart(2,"0");
+    cells.push({day:d,att:attSet.has(ds),sc:SC[sessMap[ds]]||null,today:d===now.getDate()});
+  }
   return(
     <div>
       <div style={{fontSize:12,fontWeight:600,color:"var(--mu)",marginBottom:8,textTransform:"uppercase",letterSpacing:1}}>{MONTHS[mo]} {y}</div>
       <div style={{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:3}}>
         {["D","L","M","X","J","V","S"].map(d=><div key={d} style={{fontSize:9,color:"var(--mu)",textAlign:"center",paddingBottom:3}}>{d}</div>)}
-        {cells.map((c,i)=>(
-          <div key={i} style={{aspectRatio:"1",borderRadius:5,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",position:"relative",
-            background:!c?"transparent":c.att?"var(--ac)":"var(--sf2)",
-            border:!c?"none":c.today?"1px solid var(--ac)":"1px solid var(--br)",
-            fontSize:10,fontWeight:c&&c.att?700:400,
-            color:!c?"transparent":c.att?"#000":c.today?"var(--ac)":"var(--mu)"}}>
-            {c?c.day:""}
-            {c&&c.hasSess&&!c.att&&<div style={{width:4,height:4,borderRadius:"50%",background:"var(--a2)",position:"absolute",bottom:2}}/>}
-            {c&&c.hasSess&&c.att&&<div style={{width:4,height:4,borderRadius:"50%",background:"#0a0a0b",position:"absolute",bottom:2}}/>}
-          </div>
-        ))}
+        {cells.map((c,i)=>{
+          if(!c)return<div key={i}/>;
+          const bg=c.sc?c.sc.bg:c.att?"var(--ac)":"var(--sf2)";
+          const tx=c.sc?c.sc.tx:c.att?"#000":c.today?"var(--ac)":"var(--mu)";
+          const br=c.today?"1px solid var(--ac)":c.sc?"1px solid "+c.sc.br:"1px solid var(--br)";
+          return<div key={i} style={{aspectRatio:"1",borderRadius:5,display:"flex",alignItems:"center",justifyContent:"center",background:bg,border:br,fontSize:10,fontWeight:c.att||c.sc?600:400,color:tx}}>{c.day}</div>;
+        })}
       </div>
-      <div style={{display:"flex",gap:14,marginTop:10,fontSize:10,color:"var(--mu)"}}>
-        <span style={{display:"flex",alignItems:"center",gap:4}}><span style={{width:10,height:10,background:"var(--ac)",borderRadius:2,display:"inline-block"}}/>Asistencia</span>
-        <span style={{display:"flex",alignItems:"center",gap:4}}><span style={{width:6,height:6,background:"var(--a2)",borderRadius:"50%",display:"inline-block"}}/>Con sesión registrada</span>
+      <div style={{display:"flex",gap:10,marginTop:10,fontSize:10,color:"var(--mu)",flexWrap:"wrap"}}>
+        {[["var(--gr)","#000","Completa"],["rgba(232,200,0,0.5)","#d4b800","Incompleta"],["rgba(255,58,110,0.4)","var(--a3)","No realizada"],["rgba(58,138,255,0.3)","#3a8aff","Programada"]].map(([bg,tx,l])=>(
+          <span key={l} style={{display:"flex",alignItems:"center",gap:3}}><span style={{width:9,height:9,background:bg,borderRadius:2,display:"inline-block"}}/><span style={{color:tx}}>{l}</span></span>
+        ))}
       </div>
     </div>
   );
@@ -286,73 +306,134 @@ export function ProfileSetup({userName,onSave}){
     </div>
   );
 }
-export function SessionModal({session,onClose,onSave,canEdit}){
-  const[exs,setExs]=useState(session.exercises.map(e=>({...e})));
+export function SessionModal({session,onClose,onSave,canEdit,canDeleteEx,allSessions=[]}){
+  const canDel=canDeleteEx!==false&&canEdit;
+  const init=session.exercises.map(e=>({...e,setData:getSD(e)}));
+  const[exs,setExs]=useState(init);
   const[adding,setAdding]=useState(false);
-  const[newEx,setNewEx]=useState({machineId:MACHINES[0].id,sets:3,reps:10,weight:""});
-  const[editId,setEditId]=useState(null);
-  const[editD,setEditD]=useState({});
-  const startEdit=ex=>{setEditId(ex.id);setEditD({...ex});};
-  const saveEdit=()=>{setExs(p=>p.map(e=>e.id===editId?{...editD}:e));setEditId(null);};
-  const delEx=id=>setExs(p=>p.filter(e=>e.id!==id));
-  const addEx=()=>{setExs(p=>[...p,{...newEx,id:"e_"+(Date.now())+"",sets:+newEx.sets,reps:+newEx.reps,weight:+newEx.weight}]);setAdding(false);setNewEx({machineId:MACHINES[0].id,sets:3,reps:10,weight:""});};
+  const[newMid,setNewMid]=useState(MACHINES[0].id);
+  const[newSets,setNewSets]=useState(3);
+  const[histMid,setHistMid]=useState(null);
+  const[wMode,setWMode]=useState(false);
+  const[wIdx,setWIdx]=useState(0);
+  function updSet(eid,si,f,v){setExs(p=>p.map(ex=>ex.id===eid?{...ex,setData:ex.setData.map((s,i)=>i===si?{...s,[f]:v}:s)}:ex));}
+  function addSet(eid){setExs(p=>p.map(ex=>ex.id===eid?{...ex,setData:[...ex.setData,{reps:"",weight:""}]}:ex));}
+  function remSet(eid,si){setExs(p=>p.map(ex=>ex.id===eid&&ex.setData.length>1?{...ex,setData:ex.setData.filter((_,i)=>i!==si)}:ex));}
+  function delEx(id){setExs(p=>p.filter(e=>e.id!==id));}
+  function addEx(){const sd=Array.from({length:+newSets||3},()=>({reps:"",weight:""}));setExs(p=>[...p,{id:"e_"+(Date.now()),machineId:newMid,setData:sd}]);setAdding(false);}
+  function doSave(){const norm=exs.map(ex=>{const sd=ex.setData||[];const ws=sd.map(s=>+s.weight||0).filter(w=>w>0);return{...ex,sets:sd.length,reps:sd[0]?sd[0].reps||"":"",weight:ws.length?Math.max(...ws):""};});onSave(norm);}
+  function getMHist(mid){return weightHist(allSessions.filter(s=>s.id!==session.id),mid);}
+  const histData=histMid?getMHist(histMid):null;
+  function ExCard({ex}){
+    const mc=getMachine(ex.machineId);const isHist=histMid===ex.machineId;
+    return(
+      <div style={{padding:14,background:"var(--sf2)",borderRadius:10,border:"1px solid var(--br)"}}>
+        <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:10}}>
+          <span style={{fontSize:22}}>{mc?mc.emoji:"?"}</span>
+          <div style={{flex:1}}><div style={{fontSize:13,fontWeight:600}}>{mc?mc.name:ex.machineId}</div><div style={{fontSize:10,color:"var(--mu)"}}>{mc?mc.muscles.slice(0,2).join(", "):""}</div></div>
+          <button style={{background:"none",border:"none",color:isHist?"var(--a2)":"var(--mu)",fontSize:18,cursor:"pointer",padding:"2px 6px",lineHeight:1}} title="Historial" onClick={()=>setHistMid(isHist?null:ex.machineId)}>&#x29D6;</button>
+          {canDel&&!wMode&&<button style={{...T.bd,fontSize:11,padding:"3px 8px"}} onClick={()=>delEx(ex.id)}>X</button>}
+        </div>
+        {isHist&&(
+          <div style={{marginBottom:10,padding:10,background:"var(--sf)",borderRadius:8,border:"1px solid rgba(58,255,232,0.2)"}}>
+            {histData&&histData.length>0?(
+              <>
+                <MiniLine data={histData} color="var(--a2)"/>
+                <div style={{marginTop:6,display:"flex",flexDirection:"column",gap:2}}>
+                  {histData.slice(-4).reverse().map((h,i)=>(
+                    <div key={i} style={{display:"flex",justifyContent:"space-between",fontSize:11,color:"var(--mu)"}}>
+                      <span>{h.date}</span>
+                      <span style={{color:"var(--a2)",fontFamily:"var(--fm)"}}>{h.sets}x · {h.weight}kg</span>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ):<div style={{fontSize:11,color:"var(--mu)",textAlign:"center",padding:"6px 0"}}>Sin historial previo</div>}
+          </div>
+        )}
+        <div style={{display:"grid",gridTemplateColumns:"20px 1fr 1fr "+(canEdit&&ex.setData.length>1?"26px":""),gap:5,marginBottom:4,alignItems:"center"}}>
+          <div style={{fontSize:9,color:"var(--mu)",textAlign:"center"}}>#</div>
+          <div style={{fontSize:9,color:"var(--mu)",textAlign:"center"}}>REPS</div>
+          <div style={{fontSize:9,color:"var(--mu)",textAlign:"center"}}>KG</div>
+          {canEdit&&ex.setData.length>1&&<div/>}
+        </div>
+        {ex.setData.map((s,i)=>(
+          <div key={i} style={{display:"grid",gridTemplateColumns:"20px 1fr 1fr "+(canEdit&&ex.setData.length>1?"26px":""),gap:5,marginBottom:5,alignItems:"center"}}>
+            <div style={{fontSize:11,color:"var(--mu)",textAlign:"center",fontFamily:"var(--fm)"}}>{i+1}</div>
+            <input type="number" value={s.reps} onChange={e=>updSet(ex.id,i,"reps",e.target.value)} placeholder="—" disabled={!canEdit} style={{padding:"7px 6px",fontSize:13,textAlign:"center"}}/>
+            <input type="number" value={s.weight} onChange={e=>updSet(ex.id,i,"weight",e.target.value)} placeholder="—" step="2.5" disabled={!canEdit} style={{padding:"7px 6px",fontSize:13,textAlign:"center"}}/>
+            {canEdit&&ex.setData.length>1&&<button style={{background:"var(--sf)",border:"1px solid var(--br)",borderRadius:6,padding:"4px 2px",color:"var(--mu)",fontSize:13,lineHeight:1}} onClick={()=>remSet(ex.id,i)}>&#x2212;</button>}
+          </div>
+        ))}
+        {canEdit&&<button style={{width:"100%",marginTop:5,padding:"5px",background:"var(--sf)",border:"1px dashed var(--br)",borderRadius:6,color:"var(--mu)",fontSize:12}} onClick={()=>addSet(ex.id)}>+ Serie</button>}
+      </div>
+    );
+  }
+  // WORKOUT MODE
+  if(wMode&&exs.length>0){
+    const ci=Math.min(wIdx,exs.length-1),cex=exs[ci];const mc=getMachine(cex.machineId);
+    return(
+      <div style={T.ov}>
+        <div className="fi" style={{...T.card,width:"100%",maxWidth:520,padding:0,overflow:"hidden",maxHeight:"96vh",display:"flex",flexDirection:"column"}}>
+          <div style={{padding:"12px 18px",borderBottom:"1px solid var(--br)",display:"flex",alignItems:"center",gap:10,background:"var(--sf2)"}}>
+            <button style={{...T.bg,padding:"6px 10px",fontSize:12}} onClick={()=>{setWMode(false);setWIdx(0);}}>&#x2190; Lista</button>
+            <div style={{flex:1,textAlign:"center"}}>
+              <div style={{fontFamily:"var(--fd)",fontSize:16,letterSpacing:2,color:"var(--ac)"}}>ENTRENAMIENTO</div>
+              <div style={{fontSize:11,color:"var(--mu)"}}>{session.date}</div>
+            </div>
+            <button style={{...T.bp,padding:"6px 12px",fontSize:12}} onClick={doSave}>&#x2713; OK</button>
+          </div>
+          <div style={{padding:"8px 18px 4px",background:"var(--sf2)",borderBottom:"1px solid var(--br)"}}>
+            <div style={{display:"flex",justifyContent:"space-between",fontSize:11,color:"var(--mu)",marginBottom:4}}>
+              <span>Ejercicio {ci+1} de {exs.length}</span>
+              <span>{Math.round((ci+1)/exs.length*100)}%</span>
+            </div>
+            <div style={{height:3,background:"var(--br)",borderRadius:2}}>
+              <div style={{height:"100%",width:(((ci+1)/exs.length)*100)+"%",background:"var(--ac)",borderRadius:2,transition:"width .3s"}}/>
+            </div>
+            <div style={{display:"flex",gap:5,marginTop:6,justifyContent:"center"}}>
+              {exs.map((_,i)=><div key={i} style={{width:8,height:8,borderRadius:"50%",background:i===ci?"var(--ac)":"var(--br)",cursor:"pointer"}} onClick={()=>setWIdx(i)}/>)}
+            </div>
+          </div>
+          <div style={{flex:1,overflowY:"auto",padding:18}}><ExCard ex={cex}/></div>
+          <div style={{padding:14,borderTop:"1px solid var(--br)",display:"flex",gap:10,background:"var(--sf)"}}>
+            <button style={{...T.bg,flex:1,padding:12,opacity:ci===0?0.3:1}} disabled={ci===0} onClick={()=>setWIdx(p=>p-1)}>&#x2190; Anterior</button>
+            {ci<exs.length-1
+              ?<button style={{...T.bp,flex:2,padding:12}} onClick={()=>setWIdx(p=>p+1)}>Siguiente &#x2192;</button>
+              :<button style={{...T.bp,flex:2,padding:12,background:"var(--gr)",color:"#000"}} onClick={doSave}>&#x2713; Finalizar</button>}
+          </div>
+        </div>
+      </div>
+    );
+  }
+  // LIST MODE
   return(
     <div style={T.ov} onClick={e=>e.target===e.currentTarget&&onClose()}>
-      <div className="fi" style={{...T.card,width:"100%",maxWidth:560,padding:28,maxHeight:"92vh",overflowY:"auto"}}>
+      <div className="fi" style={{...T.card,width:"100%",maxWidth:600,padding:28,maxHeight:"92vh",overflowY:"auto"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
           <div><div style={{fontFamily:"var(--fd)",fontSize:24,letterSpacing:2}}>SESIÓN</div>
-            <div style={{fontSize:13,color:"var(--mu)"}}>{session.date} . {exs.length} ejercicios</div>
+            <div style={{fontSize:13,color:"var(--mu)"}}>{session.date} · {exs.length} ejercicios</div>
           </div>
-          <button style={T.bg} onClick={onClose}>X</button>
+          <div style={{display:"flex",gap:8,alignItems:"center"}}>
+            {exs.length>0&&<button style={{...T.bg,fontSize:12,padding:"7px 12px"}} onClick={()=>{setWMode(true);setWIdx(0);}}>&#x25B6; Workout</button>}
+            <button style={T.bg} onClick={onClose}>X</button>
+          </div>
         </div>
         <div style={{display:"flex",flexWrap:"wrap",gap:5,marginBottom:14}}>
           {sessionMuscles({exercises:exs}).map(m=><span key={m} style={{...T.tag,background:"rgba(232,255,58,0.1)",color:"var(--ac)"}}>{m}</span>)}
         </div>
-        <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:14}}>
-          {exs.map(ex=>{
-            const mc=getMachine(ex.machineId);
-            if(editId===ex.id) return(
-              <div key={ex.id} style={{padding:12,background:"var(--sf2)",borderRadius:10,border:"1px solid var(--ac)"}}>
-                <div style={{marginBottom:8}}><MachineSelect value={editD.machineId} onChange={v=>setEditD({...editD,machineId:v})}/></div>
-                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8}}>
-                  {[["Series","sets"],["Reps","reps"],["Peso kg","weight"]].map(([l,k])=>(
-                    <div key={k}><label style={{fontSize:10,color:"var(--mu)",display:"block",marginBottom:3}}>{l}</label>
-                      <input type="number" value={editD[k]} step={k==="weight"?"2.5":"1"} onChange={e=>setEditD({...editD,[k]:parseFloat(e.target.value)||0})} style={{padding:"6px 10px",fontSize:13}}/>
-                    </div>
-                  ))}
-                </div>
-                <div style={{display:"flex",gap:6,marginTop:10}}>
-                  <button style={{...T.bp,fontSize:12,padding:"6px 14px"}} onClick={saveEdit}>OK Guardar</button>
-                  <button style={{...T.bg,fontSize:12}} onClick={()=>setEditId(null)}>Cancelar</button>
-                </div>
-              </div>
-            );
-            return(
-              <div key={ex.id} style={{padding:12,background:"var(--sf2)",borderRadius:10,border:"1px solid var(--br)",display:"flex",alignItems:"center",gap:10}}>
-                <span style={{fontSize:20}}>{mc?mc.emoji:"?"}</span>
-                <div style={{flex:1}}><div style={{fontSize:13,fontWeight:600}}>{mc?mc.name:ex.machineId}</div><div style={{fontSize:10,color:"var(--mu)"}}>{mc?mc.muscles.slice(0,2).join(", "):""}</div></div>
-                <span style={{fontFamily:"var(--fm)",fontSize:13,color:"var(--ac)"}}>{ex.sets}×{ex.reps}</span>
-                <span style={{fontFamily:"var(--fm)",fontSize:13,color:"var(--a2)",minWidth:56,textAlign:"right"}}>{ex.weight} kg</span>
-                {canEdit&&<div style={{display:"flex",gap:4}}>
-                  <button style={{background:"var(--br)",border:"none",borderRadius:6,padding:"4px 8px",color:"var(--tx)",fontSize:12}} onClick={()=>startEdit(ex)}>e</button>
-                  <button style={T.bd} onClick={()=>delEx(ex.id)}>X</button>
-                </div>}
-              </div>
-            );
-          })}
+        <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:14}}>
+          {exs.map(ex=><ExCard key={ex.id} ex={ex}/>)}
+          {exs.length===0&&<div style={{textAlign:"center",padding:30,color:"var(--mu)",fontSize:13}}>Sin ejercicios. Agrega uno abajo.</div>}
         </div>
         {canEdit&&!adding&&<button style={{width:"100%",padding:10,background:"var(--sf2)",border:"1px dashed var(--br)",borderRadius:10,color:"var(--mu)",fontSize:13}} onClick={()=>setAdding(true)}>+ Agregar ejercicio</button>}
         {adding&&(
           <div className="fi" style={{...T.card,marginTop:8,border:"1px solid rgba(232,255,58,0.3)"}}>
             <div style={{marginBottom:8}}><label style={{fontSize:11,color:"var(--mu)",display:"block",marginBottom:4}}>MÁQUINA</label>
-              <MachineSelect value={newEx.machineId} onChange={v=>setNewEx({...newEx,machineId:v})}/>
+              <MachineSelect value={newMid} onChange={v=>setNewMid(v)}/>
             </div>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginBottom:10}}>
-              {[["Series","sets","1"],["Reps","reps","1"],["Peso kg","weight","2.5"]].map(([l,k,st])=>(
-                <div key={k}><label style={{fontSize:10,color:"var(--mu)",display:"block",marginBottom:3}}>{l}</label>
-                  <input type="number" value={newEx[k]} step={st} placeholder={k==="weight"?"kg":""} onChange={e=>setNewEx({...newEx,[k]:k==="weight"?e.target.value:parseFloat(e.target.value)||0})} style={{padding:"6px 10px",fontSize:13}}/>
-                </div>
-              ))}
+            <div style={{marginBottom:10}}><label style={{fontSize:11,color:"var(--mu)",display:"block",marginBottom:4}}>SERIES INICIALES</label>
+              <input type="number" value={newSets} onChange={e=>setNewSets(+e.target.value||3)} min="1" max="12" style={{maxWidth:100,padding:"6px 10px"}}/>
             </div>
             <div style={{display:"flex",gap:6}}>
               <button style={{...T.bp,fontSize:12,padding:"7px 16px"}} onClick={addEx}>Agregar</button>
@@ -360,7 +441,7 @@ export function SessionModal({session,onClose,onSave,canEdit}){
             </div>
           </div>
         )}
-        {canEdit&&<button style={{...T.bp,width:"100%",marginTop:14,padding:12}} onClick={()=>onSave(exs)}>Guardar cambios &rarr;</button>}
+        {canEdit&&<button style={{...T.bp,width:"100%",marginTop:14,padding:12}} onClick={doSave}>Guardar cambios &#x2192;</button>}
       </div>
     </div>
   );

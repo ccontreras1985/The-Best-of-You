@@ -1,9 +1,9 @@
 export * from "./components1a.jsx";
 import { useState, useEffect } from "react";
 import { db } from "./supabase.js";
-import { T, MACHINES, getMachine, sessionGroups, sessionMuscles, calcNut, weightHist, monthCount, todayISO, GC, fmtCLP, MONTHS, suggestNext, AttCal, MuscleRadar, MiniLine, SessionModal, MachineSelect, calcSessionStats, getSessionPRs, QRCard } from "./components1a.jsx";
+import { T, MACHINES, getMachine, sessionGroups, sessionMuscles, calcNut, weightHist, monthCount, todayISO, GC, fmtCLP, MONTHS, suggestNext, AttCal, MuscleRadar, MiniLine, SessionModal, MachineSelect, calcSessionStats, getSessionPRs, QRCard, gLbl } from "./components1a.jsx";
 
-export function SessionsTab({user,onUpdateUser,canEdit,allUsers=[]}){
+export function SessionsTab({user,onUpdateUser,canEdit,canDeleteEx,allUsers=[]}){
   const[viewId,setViewId]=useState(null);
   const[newOpen,setNewOpen]=useState(false);
   const[newDate,setNewDate]=useState(todayISO());
@@ -79,11 +79,11 @@ export function SessionsTab({user,onUpdateUser,canEdit,allUsers=[]}){
               </div>
               <div style={{display:"flex",flexWrap:"wrap",gap:5}}>
                 {s.exercises.length===0&&<span style={{fontSize:12,color:"var(--mu)"}}>Sin ejercicios - haz click para agregar</span>}
-                {s.exercises.map(ex=>{const m=getMachine(ex.machineId);return(
+                {s.exercises.map(ex=>{const m=getMachine(ex.machineId);const sd=ex.setData&&ex.setData.length?ex.setData:[];const nSets=sd.length||+ex.sets||0;const maxW=sd.length?Math.max(...sd.map(s=>+s.weight||0),0):+ex.weight||0;return(
                   <div key={ex.id} style={{fontSize:12,background:"var(--sf2)",padding:"4px 9px",borderRadius:8,display:"flex",gap:5,alignItems:"center"}}>
                     <span>{m?m.emoji:"?"}</span><span style={{color:"var(--mu)"}}>{m?m.name:ex.machineId}</span>
-                    <span style={{fontFamily:"var(--fm)",color:"var(--ac)",fontSize:11}}>{ex.sets}×{ex.reps}</span>
-                    <span style={{fontFamily:"var(--fm)",color:"var(--a2)",fontSize:11}}>{ex.weight}kg</span>
+                    <span style={{fontFamily:"var(--fm)",color:"var(--ac)",fontSize:11}}>{nSets}s</span>
+                    {maxW>0&&<span style={{fontFamily:"var(--fm)",color:"var(--a2)",fontSize:11}}>{maxW}kg</span>}
                   </div>
                 );})}
               </div>
@@ -91,7 +91,7 @@ export function SessionsTab({user,onUpdateUser,canEdit,allUsers=[]}){
           );
         })}
       </div>
-      {viewSess&&<SessionModal session={viewSess} onClose={()=>setViewId(null)} canEdit={canEdit} onSave={exs=>save(viewId,exs)}/>}
+      {viewSess&&<SessionModal session={viewSess} onClose={()=>setViewId(null)} canEdit={canEdit} canDeleteEx={canDeleteEx} allSessions={sessions} onSave={exs=>save(viewId,exs)}/>}
     </div>
   );
 }
@@ -152,7 +152,7 @@ export function ProformaModal({student,allUsers,plans,gymInfo,onClose}){
             <div style={{padding:14,background:"#f8f8f8",borderRadius:8,border:"1px solid #eee"}}>
               <div style={{fontSize:10,color:"#999",fontWeight:700,textTransform:"uppercase",letterSpacing:1,marginBottom:8}}>Resumen del mes</div>
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
-                {[["Plan",plan?plan.name:"Sin plan"],["Ses/semana",plan&&plan.sessionsPerWeek?""+(plan.sessionsPerWeek)+"x":"-"],["Asistencias",""+(sessMonth)+" días"],["Sesiones totales",""+((student.sessions||[]).length)+""]].map(([k,v])=>(
+                {[["Plan",plan?plan.name:"Sin plan"],["Ses/semana",plan&&plan.sessionsPerWeek?""+(plan.sessionsPerWeek)+"x":"-"],["Asistencias",""+(sessInRange)+" días"],["Sesiones totales",""+((student.sessions||[]).length)+""]].map(([k,v])=>(
                   <div key={k}><div style={{fontSize:10,color:"#999"}}>{k}</div><div style={{fontSize:13,fontWeight:600}}>{v}</div></div>
                 ))}
               </div>
@@ -264,18 +264,18 @@ export function StudentDash({user,allUsers,plans,onUpdate,isEmbedded=false}){
                 <div style={{display:"flex",flexWrap:"wrap",gap:5,marginBottom:10}}>
                   {sessionMuscles(sessions[sessions.length-1]).map(m=><span key={m} style={{...T.tag,background:"rgba(58,255,232,0.1)",color:"var(--a2)"}}>{m}</span>)}
                 </div>
-                {sessions[sessions.length-1].exercises.map((ex,i)=>{const m=getMachine(ex.machineId);return(
+                {sessions[sessions.length-1].exercises.map((ex,i)=>{const m=getMachine(ex.machineId);const sd=ex.setData&&ex.setData.length?ex.setData:[];const nSets=sd.length||+ex.sets||0;const maxW=sd.length?Math.max(...sd.map(s=>+s.weight||0),0):+ex.weight||0;return(
                   <div key={i} style={{display:"flex",alignItems:"center",gap:10,padding:"6px 10px",background:"var(--sf2)",borderRadius:8,marginBottom:4}}>
                     <span style={{fontSize:18}}>{m?m.emoji:"?"}</span><span style={{flex:1,fontSize:13}}>{m?m.name:ex.machineId}</span>
-                    <span style={{fontFamily:"var(--fm)",fontSize:12,color:"var(--ac)"}}>{ex.sets}×{ex.reps}</span>
-                    <span style={{fontFamily:"var(--fm)",fontSize:12,color:"var(--a2)"}}>{ex.weight} kg</span>
+                    <span style={{fontFamily:"var(--fm)",fontSize:12,color:"var(--ac)"}}>{nSets} series</span>
+                    {maxW>0&&<span style={{fontFamily:"var(--fm)",fontSize:12,color:"var(--a2)"}}>{maxW} kg</span>}
                   </div>
                 );})}
               </div>
             )}
           </div>
         )}
-        {tab==="sessions"&&<SessionsTab user={user} onUpdateUser={onUpdate} canEdit={true} allUsers={allUsers}/>}
+        {tab==="sessions"&&<SessionsTab user={user} onUpdateUser={onUpdate} canEdit={true} canDeleteEx={isEmbedded} allUsers={allUsers}/>}
         {tab==="load"&&(
           <div>
             <div style={{marginBottom:18}}>
